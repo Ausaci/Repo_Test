@@ -61,7 +61,6 @@ jobs:
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
-        
     - name: Clone source code
       working-directory: /workdir
       run: |
@@ -73,10 +72,54 @@ jobs:
         echo "useVersionInfo=$useVersionInfo" >> $GITHUB_ENV
         echo "DATE=$(date "+%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
         echo "DATE1=$(date "+%Y-%m-%d")" >> $GITHUB_ENV
-        echo "NOTES=$(curl -fsSL git.io/JqeEI)" >> $GITHUB_ENV
 #        echo "::set-env name=useVersionInfo::$useVersionInfo"
 #        echo "::set-env name=DATE::$(date "+%Y-%m-%d %H:%M:%S")"
 
+    - name: Build firmware
+      id: build
+      run: |
+        cd /opt
+        chmod +x $GITHUB_WORKSPACE/$Get_Imgs_SH
+        sudo $GITHUB_WORKSPACE/$Get_Imgs_SH
+        sudo tar xvzf *.tar.gz
+        sudo mkdir imgs
+        sudo xz -d Armbian*Aml*\+\.img\.xz
+        sudo xz -d Armbian*Aml*\+o*
+        #sudo xz -d Armbian*Beike*\+\.img\.xz
+        sudo xz -d Armbian*Beike*\+o*
+        #sudo xz -d Armbian*L1*\+\.img\.xz
+        sudo xz -d Armbian*L1*\+o*
+        sudo mv *.img imgs
+        cd /opt/openwrt
+        sudo wget $(curl -s https://api.github.com/repos/HoldOnBro/Actions-OpenWrt/releases/34554768 | grep browser_download_url | cut -d '"' -f 4)
+        chmod +x $GITHUB_WORKSPACE/$Update_Ver_SH
+        sudo $GITHUB_WORKSPACE/$Update_Ver_SH
+        sudo ./mk_s905d_n1.sh
+        sudo cp ./*AllPackages.tar.gz ./tmp/
+        echo "::set-output name=status::success"
+    - name: Organize files
+      id: organize
+      if: steps.build.outputs.status == 'success' && !cancelled()
+      run: |
+        cd /opt/openwrt/tmp/
+        sudo pigz -6 -p $(nproc) *.img
+        sudo rm btld-rk3328.bin
+        sudo rename 's/openwrt/S-openwrt/' openwrt*gz
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        echo "::set-output name=status::success"
+    - name: Upload bin directory
+      uses: actions/upload-artifact@master
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
+      with:
+        name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        path: openwrt/bin/targets/*/*/bin.tar.gz
+
+    - name: Upload firmware directory
+      uses: actions/upload-artifact@master
+      if: env.UPLOAD_FIRMWARE == 'true' && steps.organize.outputs.status == 'success' && !cancelled()
+      with:
+        name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        path: ${{ env.FIRMWARE }}
 
     - name: Create release
       id: release
@@ -88,10 +131,28 @@ jobs:
         commit: master
         token: ${{ secrets.RELEASES_TOKEN }}
         body: |
-          ${{ env.NOTES }}
-          
+          默认IP：192.168.123.1 默认密码： password
+          当前使用版本:【编译前的最后一次[➦主源码](https://github.com/coolsnowwolf/lede)更新记录】
+          参见 Files4Build 内记录
+          53版 openwrt 固件说明：
+          1. openwrt包名格式更改为：
+              openwrt_[soc]_[board]_Rxx.xx.xx_kxx.xx.xx.img  
+          2. amlogic已支持 5.10内核，但是需要从 u盘或 tf卡启动，可以刷入emmc(仅数据分区），boot分区还是只能在 u盘或tf卡上面。
+              5.10内核的副作用是 905x3、922x等机型 hdmi 绿屏、启动时间较长、mac地址会发生变化等
+          3. amlogic盒子统一用 update-amlogic-openwrt.sh 进行升级或降级。
+          4. 新增了 N1 和章鱼星球的新格式镜像（4分区，支持在线升降级），至此，amlogic的盒子全部统一了分区格式
+              副作用是：不支持从旧格式升级，也不能降级到旧格式，mmc设备名从以前的 mmcblk1变成了mmcblk2
+          5. 调大了个别固件的rootfs分区，因为以前的512MB快不够用了
+          6. amlogic盒子的刷入emmc命令统一为：
+              cd      /root
+              ./install-to-emmc.sh
+            升级降级方法统一为：
+              1. 把 update-amlogic-openwrt.sh 及 img镜像上传至  /mnt/mmcblk2p4
+              2. cd    /mnt/mmcblk2p4
+              3. chmod   755  update-amlogic-openwrt.sh
+              4. ./update-amlogic-openwrt.sh    xxxxx.img
         artifacts: ${{ env.FIRMWARE }}/*
     
     - name: WeChat notification
       if: steps.organize.outputs.status == 'success' && !cancelled()
-      run: curl https://sc.ftqq.com/${{ secrets.ServerChan }}.send?text=${{ env.PRODUCT_NAME }} 打包完成
+      run: curl https://sc.ftqq.com/${{ secrets.ServerChan }}.send?text=${{ env.PRODUCT_NAME }}ARMv8_Firmwares 打包完成
