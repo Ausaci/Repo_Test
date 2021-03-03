@@ -1,0 +1,114 @@
+name: ARMv8_Build
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+
+#  schedule:
+#    - cron: 30 23 * * *
+#  release:
+#    types: published
+#  watch:
+#    types: started
+
+env:
+  REPO_URL: https://github.com/coolsnowwolf/lede
+  REPO_BRANCH: master
+  FEEDS_CONF: feeds.conf.default
+  DIY_P1_SH: diy-part1.sh
+  DIY_P2_SH: diy-part2.sh
+  MRG_ADD_SH: aarch64/ARMv8.sh
+  Update_Ver_SH: aarch64/autoVersion.sh
+  Get_Imgs_SH: aarch64/getImgs.sh
+  DOCKER_BUILD_SH: buildImage.sh
+  UPLOAD_BIN_DIR: false
+  UPLOAD_FIRMWARE: false
+  TZ: Asia/Shanghai
+  FILE_NAME: ARMv8
+  PRODUCT_NAME: ARMv8
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+
+#    - name: WeChat notification
+#      run: curl https://sc.ftqq.com/${{ secrets.ServerChan }}.send?text=${{ env.FILE_NAME }}开始编译
+      
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804)
+        sudo -E apt-get -qq install rename
+        sudo -E apt-get -qq install pigz
+        sudo -E apt-get -qq install time
+        sudo -E apt-get -qq install sshpass
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean
+        sudo timedatectl set-timezone "$TZ"
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+        
+    - name: Clone source code
+      working-directory: /workdir
+      run: |
+        df -hT $PWD
+        git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+        cd openwrt
+        useVersionInfo=$(git show -s --date=short --format="Author: %an<br/>date: %cd<br/>commit: %s<br/>commit hash: %H")
+        echo "useVersionInfo=$useVersionInfo" >> $GITHUB_ENV
+        echo "DATE=$(date "+%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
+        echo "DATE1=$(date "+%Y-%m-%d")" >> $GITHUB_ENV
+#        echo "::set-env name=useVersionInfo::$useVersionInfo"
+#        echo "::set-env name=DATE::$(date "+%Y-%m-%d %H:%M:%S")"
+
+
+    - name: Create release
+      id: release
+      uses: ncipollo/release-action@v1
+      with:
+        name: R${{ env.DATE }} for ${{ env.FILE_NAME }}
+        allowUpdates: true
+        tag: ${{ env.FILE_NAME }}
+        commit: master
+        token: ${{ secrets.RELEASES_TOKEN }}
+        body: |
+          默认IP：192.168.123.1 默认密码： password
+          当前使用版本:【编译前的最后一次[➦主源码](https://github.com/coolsnowwolf/lede)更新记录】
+          参见 Files4Build 内记录
+          53版 openwrt 固件说明：
+          1. openwrt包名格式更改为：
+              openwrt_[soc]_[board]_Rxx.xx.xx_kxx.xx.xx.img  
+          2. amlogic已支持 5.10内核，但是需要从 u盘或 tf卡启动，可以刷入emmc(仅数据分区），boot分区还是只能在 u盘或tf卡上面。
+              5.10内核的副作用是 905x3、922x等机型 hdmi 绿屏、启动时间较长、mac地址会发生变化等
+          3. amlogic盒子统一用 update-amlogic-openwrt.sh 进行升级或降级。
+          4. 新增了 N1 和章鱼星球的新格式镜像（4分区，支持在线升降级），至此，amlogic的盒子全部统一了分区格式
+              副作用是：不支持从旧格式升级，也不能降级到旧格式，mmc设备名从以前的 mmcblk1变成了mmcblk2
+          5. 调大了个别固件的rootfs分区，因为以前的512MB快不够用了
+          6. amlogic盒子的刷入emmc命令统一为：
+              cd      /root
+              ./install-to-emmc.sh
+            升级降级方法统一为：
+              1. 把 update-amlogic-openwrt.sh 及 img镜像上传至  /mnt/mmcblk2p4
+              2. cd    /mnt/mmcblk2p4
+              3. chmod   755  update-amlogic-openwrt.sh
+              4. ./update-amlogic-openwrt.sh    xxxxx.img
+        artifacts: ${{ env.FIRMWARE }}/*
+    
+    - name: WeChat notification
+      if: steps.organize.outputs.status == 'success' && !cancelled()
+      run: curl https://sc.ftqq.com/${{ secrets.ServerChan }}.send?text=${{ env.PRODUCT_NAME }}ARMv8_Firmwares 打包完成
