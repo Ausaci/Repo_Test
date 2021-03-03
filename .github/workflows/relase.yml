@@ -103,8 +103,8 @@ jobs:
       run: |
         cd /opt/openwrt/tmp/
         sudo pigz -6 -p $(nproc) *.img
-        sudo rm btld-rk3328.bin
-        sudo rename 's/openwrt/S-openwrt/' openwrt*gz
+#        sudo rm btld-rk3328.bin
+#        sudo rename 's/openwrt/S-openwrt/' openwrt*gz
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "::set-output name=status::success"
     - name: Upload bin directory
