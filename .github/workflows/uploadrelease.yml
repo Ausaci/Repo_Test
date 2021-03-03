@@ -1,0 +1,89 @@
+name: ARMv8_Build
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+
+#  schedule:
+#    - cron: 30 23 * * *
+#  release:
+#    types: published
+#  watch:
+#    types: started
+
+env:
+  UPLOAD_FIRMWARE: false
+  TZ: Asia/Shanghai
+  FILE_NAME: Armbian_Buster
+
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804)
+        sudo -E apt-get -qq install rename
+        sudo -E apt-get -qq install pigz
+        sudo -E apt-get -qq install time
+        sudo -E apt-get -qq install sshpass
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean
+        sudo timedatectl set-timezone "$TZ"
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+
+
+    - name: Download Files
+      id: download
+      run: |
+        cd /opt
+        sudo mkdir downloads
+        sudo chmod 777 downloads
+        cd /opt/downloads
+        sudo wget $(curl -s https://api.github.com/repos/HoldOnBro/Actions-OpenWrt/releases/32444440 | grep browser_download_url | cut -d '"' -f 4)
+        echo "::set-output name=status::success"
+        
+    - name: Organize Files
+      id: organize
+      if: steps.download.outputs.status == 'success' && !cancelled()
+      run: |
+        cd /opt/downloads
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        echo "::set-output name=status::success"
+
+    - name: Upload Files
+      uses: actions/upload-artifact@master
+      if: env.UPLOAD_FIRMWARE == 'true' && steps.organize.outputs.status == 'success' && !cancelled()
+      with:
+        name: Armbian_Buster
+        path: ${{ env.FIRMWARE }}
+
+    - name: Create release
+      id: release
+      uses: ncipollo/release-action@v1
+      with:
+        name: Armbian_Buster
+        allowUpdates: true
+        tag: ${{ env.FILE_NAME }}
+        commit: master
+        token: ${{ secrets.RELEASES_TOKEN }}
+        body: |
+        Upload Armbian Buster from [Here](https://github.com/HoldOnBro/Actions-OpenWrt/releases/tag/Files4Compile)
+        artifacts: ${{ env.FIRMWARE }}/*
