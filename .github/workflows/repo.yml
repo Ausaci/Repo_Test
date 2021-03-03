@@ -19,8 +19,8 @@ jobs:
       - name: repo-sync
         uses: repo-sync/github-sync@v2
         with:
-          source_repo: "https://github.com/klever1988/nanopi-openwrt.git"
+          source_repo: "https://github.com/HoldOnBro/Actions-OpenWrt.git"
           source_branch: "master"
-          destination_branch: "master"
-          sync_tags: "true"
+          destination_branch: "HoldOnBro"
+          sync_tags: false"
           github_token: ${{ secrets.PAT }}
