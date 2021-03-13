@@ -1,6 +1,6 @@
 # Ausaci CopyRight
 
-name: Upload2Armbian_Buster
+name: Upload2Release
 
 on:
   repository_dispatch:
@@ -25,7 +25,7 @@ env:
   RELEASE_NAME: Armbian_Buster
 
 jobs:
-  build:
+  upload:
     runs-on: ubuntu-18.04
     if: github.event.repository.owner.id == github.event.sender.id
 
@@ -55,14 +55,14 @@ jobs:
       uses: actions/upload-artifact@master
       if: env.UPLOAD_FILES == 'true' && steps.organize.outputs.status == 'success' && !cancelled()
       with:
-        name: ${{ RELEASE_NAME }}
+        name: ${{ env.RELEASE_NAME }}
         path: ${{ env.FILES }}
 
     - name: Create release
       id: release
       uses: ncipollo/release-action@v1
       with:
-        name: ${{ RELEASE_NAME }}
+        name: ${{ env.RELEASE_NAME }}
         allowUpdates: true
         tag: ${{ env.TAG_NAME }}
         commit: master
