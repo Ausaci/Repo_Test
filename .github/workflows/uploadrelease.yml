@@ -22,6 +22,7 @@ env:
   UPLOAD_FILES: false
   TZ: Asia/Shanghai
   TAG_NAME: Test
+  RELEASE_NAME: Armbian_Buster
 
 jobs:
   build:
@@ -54,14 +55,14 @@ jobs:
       uses: actions/upload-artifact@master
       if: env.UPLOAD_FILES == 'true' && steps.organize.outputs.status == 'success' && !cancelled()
       with:
-        name: Armbian_Buster
+        name: ${{ RELEASE_NAME }}
         path: ${{ env.FILES }}
 
     - name: Create release
       id: release
       uses: ncipollo/release-action@v1
       with:
-        name: Armbian_Buster
+        name: ${{ RELEASE_NAME }}
         allowUpdates: true
         tag: ${{ env.TAG_NAME }}
         commit: master
