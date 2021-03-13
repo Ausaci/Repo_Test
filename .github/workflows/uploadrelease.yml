@@ -1,3 +1,5 @@
+# Ausaci CopyRight
+
 name: Upload2Armbian_Buster
 
 on:
@@ -17,10 +19,9 @@ on:
 #    types: started
 
 env:
-  UPLOAD_FIRMWARE: false
+  UPLOAD_FILES: false
   TZ: Asia/Shanghai
-  FILE_NAME: Armbian_Buster
-
+  TAG_NAME: Test
 
 jobs:
   build:
@@ -35,10 +36,9 @@ jobs:
     - name: Download Files
       id: download
       run: |
-        cd /opt
-        sudo mkdir downloads
-        sudo chmod 777 downloads
-        cd /opt/downloads
+        sudo mkdir -p /workdir/downloads
+        sudo chmod 777 /workdir/downloads
+        cd /workdir/downloads
         sudo wget $(curl -s https://api.github.com/repos/HoldOnBro/Actions-OpenWrt/releases/32444440 | grep browser_download_url | cut -d '"' -f 4)
         echo "::set-output name=status::success"
         
@@ -46,16 +46,16 @@ jobs:
       id: organize
       if: steps.download.outputs.status == 'success' && !cancelled()
       run: |
-        cd /opt/downloads
-        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        cd /workdir/downloads
+        echo "FILES=$PWD" >> $GITHUB_ENV
         echo "::set-output name=status::success"
 
     - name: Upload Files
       uses: actions/upload-artifact@master
-      if: env.UPLOAD_FIRMWARE == 'true' && steps.organize.outputs.status == 'success' && !cancelled()
+      if: env.UPLOAD_FILES == 'true' && steps.organize.outputs.status == 'success' && !cancelled()
       with:
         name: Armbian_Buster
-        path: ${{ env.FIRMWARE }}
+        path: ${{ env.FILES }}
 
     - name: Create release
       id: release
@@ -63,9 +63,9 @@ jobs:
       with:
         name: Armbian_Buster
         allowUpdates: true
-        tag: ${{ env.FILE_NAME }}
+        tag: ${{ env.TAG_NAME }}
         commit: master
         token: ${{ secrets.RELEASES_TOKEN }}
         body: |
          Upload Armbian Buster from [Here](https://github.com/HoldOnBro/Actions-OpenWrt/releases/tag/Files4Compile)
-        artifacts: ${{ env.FIRMWARE }}/*
+        artifacts: ${{ env.FILES }}/*
