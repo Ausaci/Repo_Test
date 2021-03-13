@@ -1,6 +1,6 @@
 # Ausaci CopyRight
 
-name: Upload2Release
+name: Upload2Armbian_Buster
 
 on:
   repository_dispatch:
@@ -21,6 +21,7 @@ on:
 env:
   UPLOAD_FILES: false
   TZ: Asia/Shanghai
+  BRANCH: main
   TAG_NAME: Test
   RELEASE_NAME: Armbian_Buster
 
@@ -65,7 +66,7 @@ jobs:
         name: ${{ env.RELEASE_NAME }}
         allowUpdates: true
         tag: ${{ env.TAG_NAME }}
-        commit: master
+        commit: ${{ env.BRANCH }}
         token: ${{ secrets.RELEASES_TOKEN }}
         body: |
          Upload Armbian Buster from [Here](https://github.com/HoldOnBro/Actions-OpenWrt/releases/tag/Files4Compile)
