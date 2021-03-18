@@ -41,7 +41,7 @@ env:
   UPLOAD_WETRANSFER: true
   UPLOAD_RELEASE: false
   TZ: Asia/Shanghai
-  TAG_BRANCH: master
+  TAG_BRANCH: main
   TAG_NAME: TAG_318
   RELEASE_NAME: TAGTEST
   RELEASE_NOTE: release.txt
