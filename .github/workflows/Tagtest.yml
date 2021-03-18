@@ -44,7 +44,7 @@ env:
   TAG_BRANCH: master
   TAG_NAME: TAG_Test
   RELEASE_NAME: TAGTEST
-  RELEASE_NOTE: aarch64/release_note.txt
+  RELEASE_NOTE: release.txt
 
 jobs:
   build:
