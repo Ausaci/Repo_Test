@@ -22,7 +22,7 @@ env:
   UPLOAD_FILES: false
   TZ: Asia/Shanghai
   BRANCH: main
-  TAG_NAME: Test
+  TAG_NAME: TAG_TEST
   RELEASE_NAME: Armbian_Buster
 
 jobs:
