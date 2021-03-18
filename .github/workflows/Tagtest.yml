@@ -68,14 +68,16 @@ jobs:
         echo "::set-output name=status::success"
 
     - name: Upload firmware to release
-      uses: softprops/action-gh-release@v1
-      if: steps.tag.outputs.status == 'success' && !cancelled()
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      id: release
+      uses: ncipollo/release-action@v1
       with:
-        tag_name: ${{ steps.tag.outputs.release_tag }}
-        body_path: release.txt
-        files: /opt/*
+        name: TAGTEST
+        allowUpdates: true
+        tag: ${{ steps.tag.outputs.release_tag }}
+        commit: master
+        token: ${{ secrets.RELEASES_TOKEN }}
+        body: release.txt
+        artifacts: /opt/*
 
     - name: Delete workflow runs
       uses: GitRML/delete-workflow-runs@main
