@@ -42,7 +42,7 @@ env:
   UPLOAD_RELEASE: false
   TZ: Asia/Shanghai
   TAG_BRANCH: master
-  TAG_NAME: TAG_Test
+  TAG_NAME: TAG_318
   RELEASE_NAME: TAGTEST
   RELEASE_NOTE: release.txt
 
@@ -66,9 +66,9 @@ jobs:
       run: |
         echo "::set-output name=release_tag::"${{ env.TAG_NAME }}""
         touch release.txt
+        echo "$(date +"%Y-%m-%d %H:%M:%S Build")" >> release.txt
         [ $UPLOAD_COWTRANSFER = true ] && echo "🔗 [Cowtransfer](${{ steps.cowtransfer.outputs.url }})" >> release.txt
         [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
-        echo "$(date +"%Y-%m-%d %H:%M:%S Build")" >> release.txt
         echo "::set-output name=status::success"
 
     - name: Upload firmware to release
