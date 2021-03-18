@@ -32,6 +32,7 @@ env:
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: OpenWrt_SSH.config
+  RELEASE_NOTE: aarch64/release_note.txt
 #  DIY_P1_SH: diy-part1_ausaci.sh
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
@@ -76,7 +77,7 @@ jobs:
         tag: ${{ steps.tag.outputs.release_tag }}
         commit: master
         token: ${{ secrets.RELEASES_TOKEN }}
-        bodyFile: release.txt
+        bodyFile: ${{ env.RELEASE_NOTE}}
         artifacts: /opt/*
 
     - name: Delete workflow runs
