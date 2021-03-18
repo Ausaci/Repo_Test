@@ -32,7 +32,6 @@ env:
   REPO_BRANCH: master
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: OpenWrt_SSH.config
-  RELEASE_NOTE: aarch64/release_note.txt
 #  DIY_P1_SH: diy-part1_ausaci.sh
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
@@ -42,6 +41,10 @@ env:
   UPLOAD_WETRANSFER: true
   UPLOAD_RELEASE: false
   TZ: Asia/Shanghai
+  TAG_BRANCH: master
+  TAG_NAME: TAG_Test
+  RELEASE_NAME: TAGTEST
+  RELEASE_NOTE: aarch64/release_note.txt
 
 jobs:
   build:
@@ -61,7 +64,7 @@ jobs:
     - name: Generate release tag
       id: tag
       run: |
-        echo "::set-output name=release_tag::"TAG_Test""
+        echo "::set-output name=release_tag::"${{ env.TAG_NAME }}""
         touch release.txt
         [ $UPLOAD_COWTRANSFER = true ] && echo "🔗 [Cowtransfer](${{ steps.cowtransfer.outputs.url }})" >> release.txt
         [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
@@ -72,11 +75,11 @@ jobs:
       id: release
       uses: ncipollo/release-action@v1
       with:
-        name: TAGTEST
+        name: ${{ env.RELEASE_NAME }}
         allowUpdates: true
-        tag: ${{ steps.tag.outputs.release_tag }}
-        commit: master
-        token: ${{ secrets.RELEASES_TOKEN }}
+        tag: ${{ env.TAG_NAME }}
+        commit: ${{ env.TAG_BRANCH }}
+        token: ${{ secrets.GITHUB_TOKEN }}
         bodyFile: ${{ env.RELEASE_NOTE}}
         artifacts: /opt/*
 
