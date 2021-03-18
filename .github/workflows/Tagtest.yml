@@ -76,7 +76,7 @@ jobs:
         tag: ${{ steps.tag.outputs.release_tag }}
         commit: master
         token: ${{ secrets.RELEASES_TOKEN }}
-        body: release.txt
+        bodyFile: release.txt
         artifacts: /opt/*
 
     - name: Delete workflow runs
