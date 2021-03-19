@@ -9,7 +9,7 @@ on:
       devices:
         description: 'Device name'
         required: true
-        default: 'default'
+#        default: 'default'
       ssh:
         description: 'SSH connection to Actions'
         required: false
