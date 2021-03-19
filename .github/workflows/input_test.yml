@@ -1,6 +1,6 @@
 # Ausaci CopyRight
 
-name: Upload2Armbian_Buster
+name: input_test
 
 on:
   repository_dispatch:
@@ -26,8 +26,8 @@ env:
   UPLOAD_FILES: false
   TZ: Asia/Shanghai
   BRANCH: main
-  TAG_NAME: TAG_TEST
-  RELEASE_NAME: Armbian_Buster
+  TAG_NAME: INPUT_TEST
+  RELEASE_NAME: INPUT TEST
 
 jobs:
   upload:
@@ -53,7 +53,7 @@ jobs:
       if: steps.download.outputs.status == 'success' && !cancelled()
       run: |
         cd /workdir
-        sudo tar zcvf github.event.inputs.ssh_$(date +"%Y%m%d%H%M").tar.gz downloads
+        sudo tar zcvf $(github.event.inputs.ssh)_$(date +"%Y%m%d%H%M").tar.gz downloads
         sudo rm -rf downloads
         echo "FILES=$PWD" >> $GITHUB_ENV
         echo "::set-output name=status::success"
