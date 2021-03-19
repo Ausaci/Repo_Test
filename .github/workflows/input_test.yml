@@ -53,7 +53,7 @@ jobs:
       if: steps.download.outputs.status == 'success' && !cancelled()
       run: |
         cd /workdir
-        sudo tar zcvf ${{ github.event.inputs.ssh }}_$(date +"%Y%m%d%H%M").tar.gz downloads
+        sudo tar zcvf ${{ github.event.inputs.devices }}_$(date +"%Y%m%d%H%M").tar.gz downloads
         sudo rm -rf downloads
         echo "FILES=$PWD" >> $GITHUB_ENV
         echo "::set-output name=status::success"
