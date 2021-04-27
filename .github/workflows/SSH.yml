@@ -11,7 +11,7 @@ on:
 
 jobs:
   ssh2github:
-    runs-on: ubuntu-lastest
+    runs-on: debian-latest
 
     steps:
     - name: Checkout
