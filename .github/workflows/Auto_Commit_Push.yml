@@ -15,8 +15,9 @@ jobs:
       - name: 'Dowload Files'
         id: download
         run: |
-          svn checkout --force https://github.com/Ausaci/Archives/trunk/repo repos --username Ausaci --password hss980629
+          svn checkout --force https://github.com/Ausaci/Archives/trunk/repo downloads --username Ausaci --password hss980629
           find ./ -type d -iname ".svn" | xargs rm -rf $1
+          \cp -rf /downloads/* /repos
         
         
       - name: 'Commit Files'
