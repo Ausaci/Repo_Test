@@ -3,7 +3,7 @@
 #
 # Description: Auto download files fro private repos and push to current repo
 #
-# If you If you want to checkout the private repo, please add secrets in repo settings first:
+# If you want to checkout the private repos, please add secrets in repo settings first:
 # For "svn checkout --force ${{ URL }} ${{ DOWNLOAD_PATH }} --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }}"
 # ${{ secrets.USERNAME }}    ----    Github username
 # ${{ secrets.PASSWORD }}    ----    Github password
@@ -22,7 +22,7 @@ on:
 
 env:
   DOWNLOAD_PATH: downloads
-  #DESTINATION_PATH: repos
+  DESTINATION_PATH: filepath
   TZ: Asia/Shanghai
 
 jobs:
