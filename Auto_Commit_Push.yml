@@ -22,7 +22,7 @@ on:
 
 env:
   DOWNLOAD_PATH: downloads
-  DESTINATION_PATH: 
+  DESTINATION_PATH: filepath
   TZ: Asia/Shanghai
 
 jobs:
