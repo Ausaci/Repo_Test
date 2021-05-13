@@ -1,4 +1,4 @@
-name: 'Auto Commit & Push'
+name: Auto Commit & Push
 
 # If you If you use the svn command to check out the private warehouse, please add secrets in repo settings first:
 # ${{ secrets.USERNAME }}
@@ -8,11 +8,11 @@ name: 'Auto Commit & Push'
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 7 * *'
+    - cron: 0 0 7 * *
 
 env:
   DOWNLOAD_PATH: downloads
-  DESTINATION_PATH: repos
+  #DESTINATION_PATH: repos
   TZ: Asia/Shanghai
 
 jobs:
@@ -28,7 +28,7 @@ jobs:
           sudo timedatectl set-timezone "$TZ"
           svn checkout --force https://github.com/Ausaci/Archives/trunk/repo ${{ env.DOWNLOAD_PATH }} --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }}
           find ./ -type d -iname ".svn" | xargs rm -rf $1
-          sudo mkdir -p ${{ env.DESTINATION_PATH }}
+          sudo mkdir -p ./${{ env.DESTINATION_PATH }}
           sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}/* ./${{ env.DESTINATION_PATH }}
           sudo rm -rf ./${{ env.DOWNLOAD_PATH }}
           
