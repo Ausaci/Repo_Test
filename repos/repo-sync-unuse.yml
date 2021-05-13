@@ -1,5 +1,5 @@
 # File: .github/workflows/repo-sync.yml
-# for test context
+# for test context: 2
 name: sync-unuse-scripts
 on:
   schedule:
