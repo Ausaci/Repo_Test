@@ -25,6 +25,9 @@ env:
   DOWNLOAD_PATH: downloads
   DESTINATION_PATH: filepath
   TZ: Asia/Shanghai
+  URL_PREFIX: https://
+  DOWNLOAD_URL: github.com/Ausaci/Archives/trunk/repo
+  # 不要带 http:// 或者 https:// 等地址前缀
 
 jobs:
   auto_commit:
@@ -37,7 +40,7 @@ jobs:
         id: download
         run: |
           sudo timedatectl set-timezone "$TZ"
-          svn checkout --force https://github.com/Ausaci/Archives/trunk/repo ${{ env.DOWNLOAD_PATH }} --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }}
+          svn checkout --force ${{ env.URL_PREFIX }}${{ env.DOWNLOAD_URL }} ${{ env.DOWNLOAD_PATH }} --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }}
           find ./ -type d -iname ".svn" | xargs rm -rf $1
           sudo mkdir -p ./${{ env.DESTINATION_PATH }}
           sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}/* ./${{ env.DESTINATION_PATH }}
