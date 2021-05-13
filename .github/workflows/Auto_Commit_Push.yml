@@ -1,9 +1,19 @@
+#
+# Copyright (c) 2019-2021 Samuel <https://github.com/Ausaci/>
+#
+# Description: Auto download files fro private repos and push to current repo
+#
+# If you If you want to checkout the private repo, please add secrets in repo settings first:
+# For "svn checkout --force ${{ URL }} ${{ DOWNLOAD_PATH }} --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }}"
+# ${{ secrets.USERNAME }}    ----    Github username
+# ${{ secrets.PASSWORD }}    ----    Github password
+# For "curl -O https://${{ secrets.PAT }}@raw.githubusercontent.com/user/repo/branch/path/files"
+# ${{ secrets.PAT }}    ----    Github token [access for repo] <https://github.com/settings/tokens>
+#
+# If you want to push files to the root directory of the repo, please ommit 'DESTINATION_PATH' in env with #
+#
+
 name: Auto Commit & Push
-
-# If you If you use the svn command to check out the private warehouse, please add secrets in repo settings first:
-# ${{ secrets.USERNAME }}
-# ${{ secrets.PASSWORD }}
-
 
 on:
   workflow_dispatch:
