@@ -43,7 +43,7 @@ jobs:
           sudo timedatectl set-timezone "$TZ"
           sudo mkdir -p ./${{ env.DOWNLOAD_PATH }}
           sudo svn checkout --force ${{ env.URL_PREFIX }}${{ env.DOWNLOAD_URL }} ${{ env.DOWNLOAD_PATH }} --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }}
-          sudo find ./ -type d -iname ".svn" | xargs rm -rf $1
+          sudo find ./ -type d -iname ".svn" | sudo xargs rm -rf $1
           sudo mkdir -p ./${{ env.DESTINATION_PATH }}
           sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}/* ./${{ env.DESTINATION_PATH }}
           sudo rm -rf ./${{ env.DOWNLOAD_PATH }}
