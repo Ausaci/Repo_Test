@@ -1,4 +1,4 @@
-name: 'Auto Commit'
+name: 'Auto Commit $ Push'
 
 on:
   workflow_dispatch:
@@ -17,7 +17,7 @@ jobs:
         run: |
           svn checkout --force https://github.com/Ausaci/Archives/trunk/repo downloads --username Ausaci --password hss980629
           find ./ -type d -iname ".svn" | xargs rm -rf $1
-          \cp -rf /downloads/* /repos
+          \cp -rf ./downloads/* ./repos
         
         
       - name: 'Commit Files'
