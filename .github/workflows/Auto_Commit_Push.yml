@@ -1,0 +1,40 @@
+name: 'Auto Commit'
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 7 * *'
+
+jobs:
+  auto_commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Codes'
+        uses: actions/checkout@v2
+      
+      - name: 'Dowload Files'
+        id: download
+        sudo mkdir downloads
+        sudo chmod 777 downloads
+        cd downloads
+        svn checkout --force https://github.com/Ausaci/Archives/trunk/repo repotest --username Ausaci --password hss980629
+        find ./ -type d -name ".svn" -exec rm -rf {} \;
+        cd ..
+        
+        
+      - name: 'Commit Files'
+        id: commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git diff --quiet && git diff --staged --quiet || git commit -am 'avoid being suspended'
+          echo ::set-output name=status::success
+           
+      - name: 'GitHub Push'
+        if: steps.commit.output.status != 'success'
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          
