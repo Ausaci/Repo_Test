@@ -27,6 +27,7 @@ env:
   TZ: Asia/Shanghai
   URL_PREFIX: https://
   DOWNLOAD_URL: github.com/Ausaci/Archives/trunk/repo
+  DOWNLOAD_URL2: raw.githubusercontent.com/Ausaci/Archives/master/Scripts/wireguard-warp.sh
   # 不要带 http:// 或者 https:// 等地址前缀
 
 jobs:
@@ -43,6 +44,7 @@ jobs:
           sudo mkdir -p ./${{ env.DOWNLOAD_PATH }}
           sudo svn checkout --force ${{ env.URL_PREFIX }}${{ env.DOWNLOAD_URL }} ${{ env.DOWNLOAD_PATH }} --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }}
           sudo find ./ -type d -iname ".svn" | sudo xargs rm -rf $1
+          sudo curl -O ${{ env.URL_PREFIX }}${{ secrets.PAT }}@${{ env.DOWNLOAD_URL2 }}
           sudo mkdir -p ./${{ env.DESTINATION_PATH }}
           sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}/* ./${{ env.DESTINATION_PATH }}
           sudo rm -rf ./${{ env.DOWNLOAD_PATH }}
