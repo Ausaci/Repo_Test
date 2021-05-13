@@ -1,35 +1,46 @@
 name: 'Auto Commit & Push'
 
+# If you If you use the svn command to check out the private warehouse, please add secrets in repo settings first:
+# ${{ secrets.USERNAME }}
+# ${{ secrets.PASSWORD }}
+
+
 on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 7 * *'
 
+env:
+  DOWNLOAD_PATH: downloads
+  DESTINATION_PATH: repos
+  TZ: Asia/Shanghai
+
 jobs:
   auto_commit:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout Codes'
+      - name: Checkout
         uses: actions/checkout@v2
       
-      - name: 'Dowload Files'
+      - name: Dowload Files
         id: download
         run: |
-          svn checkout --force https://github.com/Ausaci/Archives/trunk/repo downloads --username Ausaci --password hss980629
+          sudo timedatectl set-timezone "$TZ"
+          svn checkout --force https://github.com/Ausaci/Archives/trunk/repo ${{ env.DOWNLOAD_PATH }} --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }}
           find ./ -type d -iname ".svn" | xargs rm -rf $1
-          \cp -rf ./downloads/* ./repos
-          sudo rm -rf ./downloads
+          \cp -rf ./${{ env.DOWNLOAD_PATH }}/* ./${{ env.DESTINATION_PATH }}
+          sudo rm -rf ./${{ env.DOWNLOAD_PATH }}
           
-      - name: 'Commit Files'
+      - name: Commit Files
         id: commit
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add .
-          git diff --quiet && git diff --staged --quiet || git commit -am 'repos test'
+          git diff --quiet && git diff --staged --quiet || git commit -am '$(date +"%Y-%m-%d %H:%M:%S Update")'
           echo ::set-output name=status::success
           
-      - name: 'GitHub Push'
+      - name: GitHub Push
         if: steps.commit.output.status != 'success'
         uses: ad-m/github-push-action@v0.6.0
         with:
