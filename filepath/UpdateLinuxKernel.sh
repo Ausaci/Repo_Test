@@ -101,10 +101,10 @@ fun_compare_kernel_version(){
 	function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
 	function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
 	if version_lt $KERNEL_NOW $KERNEL_LEAST; then
-		echo -e "${COLOR_RED}Your device needs to update! Kernel update program continue running...${COLOR_END}"
+		echo -e "${COLOR_RED}Your device's kernel needs to update! Kernel update program continue running...${COLOR_END}"
 	else
-		echo -e "${COLOR_GREEN}Your device DO NOT need to update!${COLOR_END}"
-		exit 1
+		echo -e "${COLOR_GREEN}Your device's kernel has already intergrated WireGuard!${COLOR_END}"
+		#exit 1
 	fi
 }
 
@@ -112,6 +112,7 @@ checkos
 
 check_sys_version
 
+# 检查系统内核是否满足内核集成 WireGuard 的最低要求
 fun_compare_kernel_version
 
 if [ $OS == "Debian" ]; then
