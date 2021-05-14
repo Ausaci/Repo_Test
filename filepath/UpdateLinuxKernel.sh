@@ -10,7 +10,11 @@
 # ./UpdateLinuxKernel.sh
 #
 
-UBUNTU_KERNEL_LATEST=5.8.0-50
+export SCRIPT_ULK_VER=1.0.1
+
+# Check kernel version command:
+# sudo apt-cache search linux-image | grep generic
+UBUNTU_KERNEL_LATEST=5.8.0-53
 
 # Set text color
 fun_set_text_color(){
