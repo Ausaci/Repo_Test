@@ -1,0 +1,79 @@
+# Ausaci CopyRight
+
+name: input_test
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      devices:
+        description: 'Device name'
+        required: true
+#        default: 'default'
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+
+#  schedule:
+#    - cron: 30 23 * * *
+#  release:
+#    types: published
+#  watch:
+#    types: started
+
+env:
+  UPLOAD_FILES: false
+  TZ: Asia/Shanghai
+  BRANCH: main
+  TAG_NAME: INPUT_TEST
+  RELEASE_NAME: INPUT TEST
+
+jobs:
+  upload:
+    runs-on: ubuntu-18.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Download Files
+      id: download
+      run: |
+        sudo mkdir -p /workdir/downloads
+        sudo chmod 777 /workdir/downloads
+        cd /workdir/downloads
+        sudo wget $(curl -s https://api.github.com/repos/Ausaci/OpenWrt-Actions-Ausaci/releases/40019349 | grep browser_download_url | cut -d '"' -f 4)
+        echo "::set-output name=status::success"
+        
+    - name: Organize Files
+      id: organize
+      if: steps.download.outputs.status == 'success' && !cancelled()
+      run: |
+        cd /workdir
+        sudo tar zcvf ${{ github.event.inputs.devices }}_$(date +"%Y%m%d%H%M").tar.gz downloads
+        sudo rm -rf downloads
+        echo "FILES=$PWD" >> $GITHUB_ENV
+        echo "::set-output name=status::success"
+
+    - name: Upload Files
+      uses: actions/upload-artifact@master
+      if: env.UPLOAD_FILES == 'true' && steps.organize.outputs.status == 'success' && !cancelled()
+      with:
+        name: ${{ env.RELEASE_NAME }}
+        path: ${{ env.FILES }}
+
+    - name: Create release
+      id: release
+      uses: ncipollo/release-action@v1
+      with:
+        name: ${{ env.RELEASE_NAME }}
+        allowUpdates: true
+        tag: ${{ env.TAG_NAME }}
+        commit: ${{ env.BRANCH }}
+        token: ${{ secrets.RELEASES_TOKEN }}
+        body: |
+         Upload Armbian Buster from [Here](https://github.com/HoldOnBro/Actions-OpenWrt/releases/tag/Files4Compile)
+        artifacts: ${{ env.FILES }}/*

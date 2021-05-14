@@ -1,0 +1,67 @@
+#
+# Copyright (c) 2019-2021 Samuel <https://github.com/Ausaci>
+#
+# Description: Auto download files fro private repos and push to current repo
+#
+# If you want to checkout the private repos, please add secrets in repo settings first:
+# For "svn checkout --force ${{ URL }} ${{ DOWNLOAD_PATH }} --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }}"
+# ${{ secrets.USERNAME }}    ----    Github username
+# ${{ secrets.PASSWORD }}    ----    Github password
+# For "curl -O https://${{ secrets.PAT }}@raw.githubusercontent.com/user/repo/branch/path/files"
+# ${{ secrets.PAT }}    ----    Github token [access for repo] <https://github.com/settings/tokens>
+#
+# If you want to push files to the root directory of the repo, please ommit 'DESTINATION_PATH' in env with #
+#
+
+name: Auto Commit & Push
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 16 * * *
+    # UTC 时区，比北京时间慢 8 个小时，示例为 “北京时间每天0点”
+
+env:
+  DOWNLOAD_PATH: downloads
+  DESTINATION_PATH: filepath
+  TZ: Asia/Shanghai
+
+jobs:
+  auto_commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Dowload Files
+        id: download
+        run: |
+          sudo timedatectl set-timezone "$TZ"
+          svn checkout --force https://github.com/user/repo/trunk/path ${{ env.DOWNLOAD_PATH }} --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }}
+          find ./ -type d -iname ".svn" | xargs rm -rf $1
+          sudo mkdir -p ./${{ env.DESTINATION_PATH }}
+          sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}/* ./${{ env.DESTINATION_PATH }}
+          sudo rm -rf ./${{ env.DOWNLOAD_PATH }}
+          
+      - name: Commit Files
+        id: commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git diff --quiet && git diff --staged --quiet || git commit -am "$(date +"%Y-%m-%d %H:%M:%S Update")"
+          echo ::set-output name=status::success
+          
+      - name: GitHub Push
+        if: steps.commit.output.status != 'success'
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          
+      - name: Delete workflow runs
+        uses: GitRML/delete-workflow-runs@main
+        with:
+          retain_days: 30
+          keep_minimum_runs: 10
+          
