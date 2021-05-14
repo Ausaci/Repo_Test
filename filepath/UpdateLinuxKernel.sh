@@ -115,18 +115,20 @@ check_sys_version
 fun_compare_kernel_version
 
 if [ $OS == "Debian" ]; then
+	echo -e "${COLOR_GREEN}*** Your system OS is: Debian ***${COLOR_END}"
 	apt update
 	apt install curl sudo lsb-release -y
 	echo "deb http://deb.debian.org/debian $(lsb_release -sc)-backports main" | sudo tee /etc/apt/sources.list.d/backports.list
 	sudo apt update
 	sudo apt install net-tools iproute2 openresolv dnsutils -y
 	sudo apt -t $(lsb_release -sc)-backports install linux-image-$(dpkg --print-architecture) linux-headers-$(dpkg --print-architecture) --install-recommends -y
-	echo -e "${COLOR_GREEN}Update Kernel Successfully!${COLOR_END} Please reboot and check [uname -r]!"
+	echo -e "${COLOR_GREEN}Update Kernel Successfully! Please reboot and check [uname -r]!${COLOR_END}"
 	
 elif [ $OS == "Ubuntu" ]; then
+	echo -e "${COLOR_GREEN}*** Your system OS is: Ubuntu ***${COLOR_END}"
 	sudo apt-get update
 	sudo apt-get install linux-image-${UBUNTU_KERNEL_LATEST}-generic --install-recommends -y
-	echo -e "${COLOR_GREEN}Update Kernel Successfully!${COLOR_END} Please reboot and check [uname -r]!"
+	echo -e "${COLOR_GREEN}Update Kernel Successfully! Please reboot and check [uname -r]!${COLOR_END}"
 else
 	echo "${COLOR_RED}Not support OS, please reinstall Debian 10 or Ubuntu 20.04 OS and retry!${COLOR_END}"
 	exit 1
