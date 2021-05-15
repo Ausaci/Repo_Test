@@ -10,11 +10,14 @@
 # ./UpdateLinuxKernel.sh
 #
 # Usage - onekey:
-# bash <(curl -fsSL shell_url)
+# sudo bash -c "$(curl -fsSL shell_url)"
 #
 # Usage - onekey2:
-# curl -fsSL shell_url | sudo bash
+# bash <(curl -fsSL shell_url)
 #
+# Usage - onekey3:
+# curl -fsSL shell_url | sudo bash
+# 
 
 export SCRIPT_ULK_VER=1.0.2
 
@@ -132,8 +135,8 @@ fun_update_kernel(){
 		echo -e "${COLOR_GREEN}Update Kernel Successfully! Please reboot and check [uname -r]!${COLOR_END}"
 	else
 		echo "${COLOR_RED}Not support OS, please reinstall Debian 10 or Ubuntu 20.04 OS and retry!${COLOR_END}"
-		exit 1
 	fi
+	exit 1
 }
 
 # 检查系统
@@ -145,3 +148,4 @@ check_sys_version
 fun_compare_kernel_version
 
 fun_update_kernel
+
