@@ -13,7 +13,7 @@
 # If you want to push files to the root directory of the repo, please ommit 'DESTINATION_PATH' in env with #
 #
 
-name: Auto Commit & Push
+name: Auto renew files
 
 on:
   workflow_dispatch:
