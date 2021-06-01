@@ -1,16 +1,23 @@
 #
 # Copyright (c) 2019-2021 Samuel <https://github.com/Ausaci>
 #
-# Description: Auto download files fro private repos and push to current repo
+# Description: Auto download files of private repos and push to current repo
 #
 # If you want to checkout the private repos, please add secrets in repo settings first:
+#
 # For "svn checkout --force ${{ env.URL_PREFIX }}${{ env.DOWNLOAD_URL }} ${{ env.DOWNLOAD_PATH }} --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }}"
 # ${{ secrets.USERNAME }}    ----    Github username
 # ${{ secrets.PASSWORD }}    ----    Github password
-# For "curl -O ${{ env.URL_PREFIX }}${{ secrets.PAT }}@${{ env.DOWNLOAD_URL }}"
-# ${{ secrets.PAT }}    ----    Github token [access for repo] <https://github.com/settings/tokens>
 #
-# If you want to push files to the root directory of the repo, please ommit 'DESTINATION_PATH' in env with #
+# For "curl -O ${{ env.URL_PREFIX }}${{ secrets.SOURCEPAT }}@${{ env.DOWNLOAD_URL }}"
+# ${{ secrets.SOURCEPAT }}    ----    Github token [access for repo] <https://github.com/settings/tokens>
+#
+# For "git clone -b ${{ env.SOURCE_BRANCH }} ${{ env.URL_PREFIX }}${{ secrets.SOURCEPAT }}@${{ env.SOURCE_REPO }} ${{ env.CLONEDIR }}"
+# ${{ secrets.SOURCEPAT }}    ----    Github token [access for repo] <https://github.com/settings/tokens>
+#
+# ${{ secrets.PAT }} is your DEST repo's access token
+#
+# If you want to push files to the root directory of the repo, please ommit 'DEST_PATH' in env with #
 #
 
 name: Auto Commit & Push Template
@@ -24,7 +31,7 @@ on:
 env:
   TZ: Asia/Shanghai
   DOWNLOAD_PATH: downloads
-  DESTINATION_PATH: filepath
+  DEST_PATH: filepath
   URL_PREFIX: https://
   DOWNLOAD_URL: github.com/user/repo/trunk/path
   # 不要带 http:// 或者 https:// 等地址前缀
@@ -44,8 +51,8 @@ jobs:
           sudo mkdir -p ./${{ env.DOWNLOAD_PATH }}
           sudo svn checkout --force ${{ env.URL_PREFIX }}${{ env.DOWNLOAD_URL }} ${{ env.DOWNLOAD_PATH }} --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }}
           sudo find ./ -type d -iname ".svn" | sudo xargs rm -rf $1
-          sudo mkdir -p ./${{ env.DESTINATION_PATH }}
-          sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}/* ./${{ env.DESTINATION_PATH }}
+          sudo mkdir -p ./${{ env.DEST_PATH }}
+          sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}/* ./${{ env.DEST_PATH }}
           sudo rm -rf ./${{ env.DOWNLOAD_PATH }}
           
       - name: Commit Files

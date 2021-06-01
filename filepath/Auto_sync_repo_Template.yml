@@ -1,0 +1,71 @@
+#
+# Copyright (c) 2019-2021 Samuel <https://github.com/Ausaci>
+#
+# Description: Auto git clone repos and push to destination repo
+#
+# If you want to checkout the private repos, please add secrets in repo settings first:
+# 
+# For "svn checkout --force ${{ env.URL_PREFIX }}${{ env.DOWNLOAD_URL }} ${{ env.DOWNLOAD_PATH }} --username ${{ secrets.USERNAME }} --password ${{ secrets.PASSWORD }}"
+# ${{ secrets.USERNAME }}    ----    Github username
+# ${{ secrets.PASSWORD }}    ----    Github password
+#
+# For "curl -O ${{ env.URL_PREFIX }}${{ secrets.PAT }}@${{ env.DOWNLOAD_URL }}"
+# ${{ secrets.SOURCEPAT }}    ----    Github token [access for repo] <https://github.com/settings/tokens>
+#
+# For "git clone -b ${{ env.SOURCE_BRANCH }} ${{ env.URL_PREFIX }}${{ secrets.SOURCEPAT }}@${{ env.SOURCE_REPO }} ${{ env.CLONEDIR }}"
+# ${{ secrets.SOURCEPAT }}    ----    Github token [access for repo] <https://github.com/settings/tokens>
+#
+# ${{ secrets.PAT }} is your DEST repo's access token
+#
+
+name: sync-repo-template
+
+on:
+  workflow_dispatch:
+  #schedule:
+    #- cron: '00 16 * * *'
+
+env:
+  TZ: Asia/Shanghai
+  USE_SSH: false
+  URL_PREFIX: https://
+  SOURCE_REPO: github.com/user/repo.git
+  SOURCE_BRANCH: master
+  DEST_REPO: user/repo
+  DEST_BRANCH: master
+  CLONEDIR: clonedir
+  
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name: Initial environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo timedatectl set-timezone "$TZ"
+        git config --global user.name 'GitHub Actions' 
+        git config --global user.email 'noreply@github.com'
+        
+    - name: SSH to source repo
+      if: env.USE_SSH == 'true'
+      run: |
+        mkdir -p ~/.ssh
+        echo -e "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan gitee.com > ~/.ssh/known_hosts
+        ssh-keyscan github.com > ~/.ssh/known_hosts
+        
+    - name: Clone source repo
+      run: |
+        git clone -b ${{ env.SOURCE_BRANCH }} ${{ env.URL_PREFIX }}${{ env.SOURCE_REPO }} ${{ env.CLONEDIR }}
+        #git clone -b ${{ env.SOURCE_BRANCH }} ${{ env.URL_PREFIX }}${{ secrets.SOURCEPAT }}@${{ env.SOURCE_REPO }} ${{ env.CLONEDIR }}
+        
+    - name: Push to destination repo
+      uses: ad-m/github-push-action@master
+      with:
+        directory: ${{ env.CLONEDIR }}
+        github_token: ${{ secrets.PAT }}
+        repository: ${{ env.DEST_REPO }}
+        branch: ${{ env.DEST_BRANCH }}
