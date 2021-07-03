@@ -41,7 +41,7 @@ jobs:
         sudo mkdir -p /workdir/downloads
         sudo chmod 777 /workdir/downloads
         cd /workdir/downloads
-        sudo wget $(curl -s https://api.github.com/repos/HoldOnBro/Actions-OpenWrt/releases/32444440 | grep browser_download_url | cut -d '"' -f 4)
+        sudo wget $(curl -s https://api.github.com/repos/HoldOnBro/Actions-OpenWrt/releases/39511025 | grep browser_download_url | cut -d '"' -f 4)
         echo "::set-output name=status::success"
         
     - name: Organize Files
