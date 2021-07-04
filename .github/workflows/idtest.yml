@@ -40,8 +40,8 @@ jobs:
       run: |
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
-        echo $github.event.repository.owner.id
-        echo $github.event.sender.id
+        echo ${{github.event.repository.owner.id}}
+        echo ${{github.event.sender.id}}
 
     - name: SSH connection to Actions
       uses: P3TERX/ssh2actions@v1.0.0
