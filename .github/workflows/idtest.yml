@@ -1,6 +1,6 @@
 # Ausaci CopyRight
 
-name: Upload2Armbian_Buster
+name: id output
 
 on:
   repository_dispatch:
@@ -26,7 +26,7 @@ env:
   RELEASE_NAME: Armbian_Buster
 
 jobs:
-  upload:
+  idoutput:
     runs-on: ubuntu-18.04
     if: github.event.repository.owner.id == github.event.sender.id
 
