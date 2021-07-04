@@ -28,7 +28,7 @@ env:
 jobs:
   idoutput:
     runs-on: ubuntu-18.04
-    if: github.event.repository.owner.id == github.event.sender.id
+    if: github.event.sender.id == '54447830'
 
     steps:
     - name: Checkout
