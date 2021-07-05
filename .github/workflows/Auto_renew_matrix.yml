@@ -61,9 +61,6 @@ jobs:
           # delete .svn & LICENSE
           sudo find ./ -type d -iname ".svn" | sudo xargs rm -rf $1
           sudo find ./ -type f -iname "LICENSE" | sudo xargs rm -rf $1
-          # Copy to DESTINATION_PATH
-          sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}/* ./${{ env.DESTINATION_PATH }}
-          sudo rm -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
 
       - name: Dowload Files (CURL_PUB)
         id: CURLPUB
@@ -73,10 +70,7 @@ jobs:
           cd ${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
           ${{ env.CURL_PUB }} -O ${{ matrix.source_curl_url }} ${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
           cd ..
-          # Copy to DESTINATION_PATH
-          sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}/* ./${{ env.DESTINATION_PATH }}
-          sudo rm -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
-
+          
       - name: Dowload Files (SVN_PVT)
         id: SVNPVT
         if: matrix.svntype == 'SVNPVT'
@@ -86,10 +80,7 @@ jobs:
           # delete .svn & LICENSE
           sudo find ./ -type d -iname ".svn" | sudo xargs rm -rf $1
           sudo find ./ -type f -iname "LICENSE" | sudo xargs rm -rf $1
-          # Copy to DESTINATION_PATH
-          sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}/* ./${{ env.DESTINATION_PATH }}
-          sudo rm -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
-
+                    
       - name: Dowload Files (CURL_PVT)
         id: CURLPVT
         if: matrix.curltype == 'CURLPVT'
@@ -98,13 +89,13 @@ jobs:
           cd ${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
           ${{ env.CURL_PVT }} -O ${{ matrix.source_curl_url }} ${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
           cd ..
-          # Copy to DESTINATION_PATH
-          sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}/* ./${{ env.DESTINATION_PATH }}
-          sudo rm -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
                     
       - name: Commit Files
         id: commit
         run: |
+          # Copy to DESTINATION_PATH
+          sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}/* ./${{ env.DESTINATION_PATH }}
+          sudo rm -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add .
