@@ -68,7 +68,7 @@ jobs:
         run: |
           # checkout with CURL_PUB
           cd ${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
-          ${{ env.CURL_PUB }} -O ${{ matrix.source_curl_url }} ${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
+          ${{ env.CURL_PUB }} -O ${{ matrix.source_curl_url }}
           cd ..
           
       - name: Dowload Files (SVN_PVT)
@@ -87,7 +87,7 @@ jobs:
         run: |
           # checkout with CURL_PVT
           cd ${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
-          ${{ env.CURL_PVT }} -O ${{ matrix.source_curl_url }} ${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
+          ${{ env.CURL_PVT }} -O ${{ matrix.source_curl_url }}
           cd ..
                     
       - name: Commit Files
