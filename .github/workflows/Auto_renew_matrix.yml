@@ -94,7 +94,7 @@ jobs:
         id: commit
         run: |
           # Copy to DESTINATION_PATH
-          sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}/* ./${{ env.DESTINATION_PATH }}
+          sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}/* ./${{ matrix.dest_path }}
           sudo rm -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
