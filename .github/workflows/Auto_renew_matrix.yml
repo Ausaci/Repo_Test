@@ -54,7 +54,7 @@ jobs:
       
       - name: Dowload Files (SVN_PUB)
         id: SVNPUB
-        if: ${{ -n $matrix.source_svn_url }} && ${{ $matrix.type == "PUB" }}
+        if: ${{ $matrix.source_svn_url && $matrix.type == "PUB" }}
         run: |
           # checkout with SVN_PUB
           ${{ env.SVN_PUB }} ${{ matrix.source_svn_url }} ${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
@@ -67,7 +67,7 @@ jobs:
 
       - name: Dowload Files (CURL_PUB)
         id: CURLPUB
-        if: ${{ -n $matrix.source_curl_url }} && ${{ $matrix.type == "PUB" }}
+        if: ${{ $matrix.source_curl_url && $matrix.type == "PUB" }}
         run: |
           # checkout with CURL_PUB
           cd ${{ env.DOWNLOAD_PATH }}
@@ -79,7 +79,7 @@ jobs:
 
       - name: Dowload Files (SVN_PVT)
         id: SVNPVT
-        if: ${{ -n $matrix.source_svn_url }} && ${{ $matrix.type == "PVT" }}
+        if: ${{ $matrix.source_svn_url && $matrix.type == "PVT" }}
         run: |
           # checkout with SVN_PVT
           ${{ env.SVN_PVT }} ${{ matrix.source_svn_url }} ${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
@@ -92,7 +92,7 @@ jobs:
 
       - name: Dowload Files (CURL_PVT)
         id: CURLPVT
-        if: ${{ -n $matrix.source_curl_url }} && ${{ $matrix.type == "PVT" }}
+        if: ${{ $matrix.source_curl_url && $matrix.type == "PVT" }}
         run: |
           # checkout with CURL_PVT
           cd ${{ env.DOWNLOAD_PATH }}
