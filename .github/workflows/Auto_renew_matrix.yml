@@ -1,0 +1,119 @@
+#
+# Copyright (c) 2019-2021 Samuel <https://github.com/Ausaci>
+#
+# Description: Auto download files fro private repos and push to current repo
+#
+# If you want to checkout the private repos, please add secrets in repo settings first:
+# For "svn checkout --force ${{ env.URL_PREFIX }}${{ env.DOWNLOAD_URL }} ${{ env.DOWNLOAD_PATH }} --username ${{ secrets.USERNAME }} --password ${{ secrets.PAT }}"
+# ${{ secrets.USERNAME }}    ----    Github username
+# ${{ secrets.PAT }}    ----    Github token [access for repo] <https://github.com/settings/tokens>
+# For "curl -O ${{ env.URL_PREFIX }}${{ secrets.PAT }}@${{ env.DOWNLOAD_URL }}"
+# ${{ secrets.PAT }}    ----    Github token [access for repo] <https://github.com/settings/tokens>
+#
+# If you want to push files to the root directory of the repo, dest_path should be empty in matrix
+#
+
+name: Auto sync scripts
+
+on:
+  workflow_dispatch:
+  #schedule:
+    #- cron: 0 16 1 * *
+
+env:
+  TZ: Asia/Shanghai
+  DOWNLOAD_PATH: downloads
+  SVN_PUB: 'sudo svn checkout --force'
+  CURL_PUB: 'sudo curl'
+  SVN_PVT: 'sudo svn checkout --force --username ${{ secrets.SOURCE_USERNAME }} --password ${{ secrets.SOURCE_PAT }}'
+  CURL_PVT: 'sudo curl -H "Authorization: token ${{ secrets.SOURCE_PAT }}" -H "Accept: application/octet-stream"'
+
+jobs:
+  auto_commit:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    name: Update ${{ matrix.dest_path }}
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        include:
+          - { source_svn_url: "https://github.com/P3TERX/script/trunk", source_curl_url: "https://raw.githubusercontent.com/teddysun/across/master/bbr.sh", dest_path: "Shell_Scripts", type: "PUB" }
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Initial environments
+        run: |
+          sudo timedatectl set-timezone "$TZ"
+          sudo mkdir -p ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
+          sudo mkdir -p ./${{ matrix.dest_path }}
+          sudo mkdir -p /workdir
+      
+      - name: Dowload Files (SVN_PUB)
+        id: SVN_PUB
+        if: [ -n ${{ matrix.source_svn_url }} ] && ${{ matrix.type }} == "PUB"
+        run: |
+          # checkout with SVN_PUB
+          ${{ env.SVN_PUB }} ${{ matrix.source_svn_url }} ${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
+          # delete .svn & LICENSE
+          sudo find ./ -type d -iname ".svn" | sudo xargs rm -rf $1
+          sudo find ./ -type f -iname "LICENSE" | sudo xargs rm -rf $1
+          # Copy to DESTINATION_PATH
+          sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}/* ./${{ env.DESTINATION_PATH }}
+          sudo rm -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
+
+      - name: Dowload Files (CURL_PUB)
+        id: CURL_PUB
+        if: [ -n ${{ matrix.source_curl_url }} ] && ${{ matrix.type }} == "PUB"
+        run: |
+          # checkout with CURL_PUB
+          cd ${{ env.DOWNLOAD_PATH }}
+          ${{ env.CURL_PUB }} -O ${{ matrix.source_curl_url }} ${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
+          cd ..
+          # Copy to DESTINATION_PATH
+          sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}/* ./${{ env.DESTINATION_PATH }}
+          sudo rm -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
+
+      - name: Dowload Files (SVN_PVT)
+        id: SVN_PVT
+        if: [ -n ${{ matrix.source_svn_url }} ] && ${{ matrix.type }} == "PVT"
+        run: |
+          # checkout with SVN_PVT
+          ${{ env.SVN_PVT }} ${{ matrix.source_svn_url }} ${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
+          # delete .svn & LICENSE
+          sudo find ./ -type d -iname ".svn" | sudo xargs rm -rf $1
+          sudo find ./ -type f -iname "LICENSE" | sudo xargs rm -rf $1
+          # Copy to DESTINATION_PATH
+          sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}/* ./${{ env.DESTINATION_PATH }}
+          sudo rm -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
+
+      - name: Dowload Files (CURL_PVT)
+        id: CURL_PVT
+        if: [ -n ${{ matrix.source_curl_url }} ] && ${{ matrix.type }} == "PVT"
+        run: |
+          # checkout with CURL_PVT
+          cd ${{ env.DOWNLOAD_PATH }}
+          ${{ env.CURL_PVT }} -O ${{ matrix.source_curl_url }} ${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
+          cd ..
+          # Copy to DESTINATION_PATH
+          sudo \cp -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}/* ./${{ env.DESTINATION_PATH }}
+          sudo rm -rf ./${{ env.DOWNLOAD_PATH }}_${{ matrix.dest_path }}
+                    
+      - name: Commit Files
+        id: commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git diff --quiet && git diff --staged --quiet || git commit -am "$(date +"%Y-%m-%d %H:%M:%S Update")"
+          echo ::set-output name=status::success
+          
+      - name: GitHub Push
+        if: steps.commit.output.status != 'success'
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
