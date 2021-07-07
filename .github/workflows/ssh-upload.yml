@@ -1,4 +1,4 @@
-name: warp-ssh
+name: ssh-upload
 
 on:
   repository_dispatch:
@@ -9,6 +9,11 @@ on:
         required: true
         default: 'true'
 
+env:
+  TAG_BRANCH: main
+  TAG_NAME: SSH_UPLOAD
+  RELEASE_NAME: SSH_UPLOAD
+  
 jobs:
   ssh2github:
     runs-on: ubuntu-latest
@@ -21,7 +26,7 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        sudo mkdir -p /workdir
+        sudo mkdir -p /workdir/upload
         sudo chown $USER:$GROUPS /workdir
 
     - name: SSH connection to Actions
@@ -31,3 +36,14 @@ jobs:
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         
+    - name: Upload to release
+      id: release
+      uses: ncipollo/release-action@v1
+      with:
+        name: ${{ env.RELEASE_NAME }}
+        allowUpdates: true
+        tag: ${{ env.TAG_NAME }}
+        commit: ${{ env.TAG_BRANCH }}
+        token: ${{ secrets.RELEASES_TOKEN }}
+        body: $(date +"%Y-%m-%d %H:%M:%S Update")
+        artifacts: /workdir/upload/*
