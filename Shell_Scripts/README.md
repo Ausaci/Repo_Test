@@ -244,6 +244,42 @@ curl -fsSL git.io/gping.sh | sudo bash
 sudo rm -f /usr/local/bin/gping
 ```
 
+## hostname.sh
+
+Modify hostname
+
+```
+curl -fsSL git.io/hostname.sh | sudo bash -s <HOSTNAME>
+```
+
+## cpufetch.sh
+
+Install latest version [cpufetch](https://github.com/Dr-Noob/cpufetch/releases/latest)
+
+- Install cpufetch
+```
+curl -fsSL git.io/cpufetch.sh | sudo bash
+```
+
+- Uninstall cpufetch
+```
+sudo rm -f /usr/local/bin/cpufetch
+```
+
+## btop.sh
+
+Install latest version [btop](https://github.com/aristocratos/btop/releases/latest)
+
+- Install btop
+```
+curl -fsSL git.io/btop.sh | sudo bash
+```
+
+- Uninstall btop
+```
+sudo rm -f /usr/local/bin/btop
+```
+
 ## Lisence
 
 [MIT](https://github.com/P3TERX/script/blob/master/LICENSE) © P3TERX

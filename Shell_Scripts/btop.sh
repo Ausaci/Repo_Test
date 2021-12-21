@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2020-2021 P3TERX <https://p3terx.com>
+# Copyright (c) 2021 P3TERX <https://p3terx.com>
 #
 # This is free software, licensed under the MIT License.
 # See /LICENSE for more information.
 #
 # https://github.com/P3TERX/script
-# File name: speedtest-cli.sh
-# Description: Install Ookla Speedtest CLI
+# File name: btop.sh
+# Description: Install latest version btop
 # System Required: GNU/Linux
-# Version: 1.3
+# Version: 1.0
 #
 
 set -o errexit
@@ -24,9 +24,10 @@ Font_color_suffix="\033[0m"
 INFO="[${Green_font_prefix}INFO${Font_color_suffix}]"
 ERROR="[${Red_font_prefix}ERROR${Font_color_suffix}]"
 
-PROJECT_NAME='Ookla Speedtest CLI'
+PROJECT_NAME='btop'
+GH_API_URL='https://api.github.com/repos/aristocratos/btop/releases/latest'
+BIN_NAME='btop'
 BIN_DIR='/usr/local/bin'
-BIN_NAME='speedtest'
 BIN_FILE="${BIN_DIR}/${BIN_NAME}"
 
 if [[ $(uname -s) != Linux ]]; then
@@ -51,16 +52,16 @@ else
 fi
 case ${OS_ARCH} in
 *86)
-    FILE_KEYWORD='i386'
+    FILE_KEYWORD='linux-i686.tbz'
     ;;
 x86_64 | amd64)
-    FILE_KEYWORD='x86_64'
+    FILE_KEYWORD='linux-x86_64.tbz'
     ;;
 aarch64 | arm64)
-    FILE_KEYWORD='aarch64'
+    FILE_KEYWORD='linux-aarch64.tbz'
     ;;
 arm*)
-    FILE_KEYWORD='arm'
+    FILE_KEYWORD='linux-armhf.tbz'
     ;;
 *)
     echo -e "${ERROR} Unsupported architecture: ${OS_ARCH} ${PKGT}"
@@ -70,12 +71,15 @@ esac
 echo -e "${INFO} Architecture: ${OS_ARCH} ${PKGT}"
 
 echo -e "${INFO} Get ${PROJECT_NAME} download URL ..."
-DOWNLOAD_URL="https://install.speedtest.net/app/cli/ookla-speedtest-1.0.0-${FILE_KEYWORD}-linux.tgz"
+DOWNLOAD_URL=$(curl -fsSL ${GH_API_URL} | grep 'browser_download_url' | cut -d'"' -f4 | grep "${FILE_KEYWORD}")
 echo -e "${INFO} Download URL: ${DOWNLOAD_URL}"
 
 echo -e "${INFO} Installing ${PROJECT_NAME} ..."
-curl -LS "${DOWNLOAD_URL}" | tar xzC ${BIN_DIR} ${BIN_NAME}
-chmod +x ${BIN_FILE}
+curl -L "${DOWNLOAD_URL}" | tar xjC ${BIN_DIR} bin/btop --strip-components 1
+chmod 755 ${BIN_FILE}
+chown root:root ${BIN_FILE}
+chmod u+s ${BIN_FILE}
+
 if [[ ! $(echo ${PATH} | grep ${BIN_DIR}) ]]; then
     ln -sf ${BIN_FILE} /usr/bin/${BIN_NAME}
 fi
