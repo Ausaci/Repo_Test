@@ -40,7 +40,7 @@ jobs:
         run: |
           cd ztncui
           pwd
-          docker buildx build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE }}:${{ env.DEFAULT_TAG }} --platform=linux/amd64,linux/arm,linux/arm64 . --push
+          docker buildx build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE }}:${{ env.DEFAULT_TAG }} --platform=linux/amd64,linux/arm64 . --push
 
       - name: Delete workflow runs
         uses: GitRML/delete-workflow-runs@main
