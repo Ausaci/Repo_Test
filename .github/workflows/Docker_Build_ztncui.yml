@@ -27,6 +27,7 @@ jobs:
         run: |
           # 打开 ztncui 目录
           cd ztncui
+          pwd
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           # 启用 buildx 插件
           export DOCKER_CLI_EXPERIMENTAL=enabled
@@ -35,9 +36,10 @@ jobs:
           docker buildx inspect mybuilder --bootstrap
           docker buildx ls
 
-      - name: Build Docker gimls
+      - name: Build Docker Image ${{ env.IMAGE }}
         run: |
           cd ztncui
+          pwd
           docker buildx build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE }}:${{ env.DEFAULT_TAG }} --platform=linux/amd64,linux/arm,linux/arm64 . --push
 
       - name: Delete workflow runs
