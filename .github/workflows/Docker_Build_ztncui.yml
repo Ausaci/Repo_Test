@@ -31,8 +31,10 @@ jobs:
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           # 启用 buildx 插件
           export DOCKER_CLI_EXPERIMENTAL=enabled
-          docker run --privileged --rm docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
+          docker run --privileged --rm tonistiigi/binfmt --install all
           docker buildx create --use --name mybuilder
+          ll /proc/sys/fs/binfmt_misc
+          cat /proc/sys/fs/binfmt_misc/qemu-*
           docker buildx inspect mybuilder --bootstrap
           docker buildx ls
 
@@ -40,7 +42,7 @@ jobs:
         run: |
           cd ztncui
           pwd
-          docker buildx build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE }}:${{ env.DEFAULT_TAG }} --platform=linux/amd64,linux/arm64 . --push
+          docker buildx build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE }} --platform=linux/amd64,linux/arm64 . --push
 
       - name: Delete workflow runs
         uses: GitRML/delete-workflow-runs@main
