@@ -1,8 +1,13 @@
 name: build ztncui
+
 on:
   workflow_dispatch:
   #schedule:
    # - cron: 35 21 * * 4
+
+env:
+  IMAGE: ztncui-aio
+  DEFAULT_TAG: latest
 
 jobs:
   build_docker:
@@ -33,7 +38,7 @@ jobs:
       - name: Build Docker gimls
         run: |
           cd ztncui
-          docker buildx build -t ${{ secrets.DOCKER_USERNAME }}/gimls --platform=linux/amd64,linux/arm,linux/arm64 . --push
+          docker buildx build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE }}:${{ env.DEFAULT_TAG }} --platform=linux/amd64,linux/arm,linux/arm64 . --push
 
       - name: Delete workflow runs
         uses: GitRML/delete-workflow-runs@main
