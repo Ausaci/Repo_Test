@@ -33,7 +33,7 @@ jobs:
           export DOCKER_CLI_EXPERIMENTAL=enabled
           docker run --privileged --rm tonistiigi/binfmt --install all
           docker buildx create --use --name mybuilder
-          ll /proc/sys/fs/binfmt_misc
+          ls /proc/sys/fs/binfmt_misc
           cat /proc/sys/fs/binfmt_misc/qemu-*
           docker buildx inspect mybuilder --bootstrap
           docker buildx ls
