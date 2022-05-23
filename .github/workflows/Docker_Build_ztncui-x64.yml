@@ -1,0 +1,61 @@
+name: build ztncui_x64
+
+on:
+  workflow_dispatch:
+  #schedule:
+   # - cron: 35 21 * * 4
+
+env:
+  TZ: Asia/Shanghai
+  WORKDIR: ztncui
+  GIT_URL: https://github.com/key-networks/ztncui-aio.git
+  GIT_BRANCH: master
+  DOCKERFILE: Dockerfile
+  IMAGE: ztncui-aio
+  IMAGE_TAG: x64_$(date +"%Y%m%d")
+
+jobs:
+  build_docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Install build dependencies
+        run: |
+          df -h
+          sudo timedatectl set-timezone "${{ env.TZ }}"
+          date
+          # git clone 源代码至 ztncui 目录
+          git clone -b ${{ env.GIT_BRANCH }} ${{ env.GIT_URL }} ${{ env.WORKDIR }}
+
+      - name: login docker
+        run: |
+          # 打开 ztncui 目录
+          cd ${{ env.WORKDIR }}
+          pwd
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          # 启用 buildx 插件
+          export DOCKER_CLI_EXPERIMENTAL=enabled
+          docker run --privileged --rm tonistiigi/binfmt --install all
+          docker buildx create --use --name mybuilder
+          ls /proc/sys/fs/binfmt_misc
+          cat /proc/sys/fs/binfmt_misc/qemu-*
+          # 检查 buildx 创建的 mybuilder 是否生效
+          docker buildx inspect mybuilder --bootstrap
+          docker buildx ls
+
+      - name: Build Docker Image ${{ env.IMAGE }} ${{ env.IMAGE_TAG }}
+        run: |
+          pwd
+          cd ${{ env.WORKDIR }}
+          pwd
+          docker buildx build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE }}:latest --platform=linux/amd64 --file ${{ env.DOCKERFILE }} . --push
+          docker buildx build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE }}:${{ env.IMAGE_TAG }} --platform=linux/amd64 --file ${{ env.DOCKERFILE }} . --push
+
+      - name: Delete workflow runs
+        uses: GitRML/delete-workflow-runs@main
+        with:
+          retain_days: 15
+          keep_minimum_runs: 3
