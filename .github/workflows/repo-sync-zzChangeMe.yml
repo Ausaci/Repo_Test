@@ -1,0 +1,84 @@
+# File: .github/workflows/sync-souce-owner-repo-template.yml
+# Need add secrets.PAT
+
+# 1. Need Change Here!
+name: repo-sync-Repo_Test
+on:
+  workflow_dispatch:
+ # schedule:
+   # - cron: '0 1 * * 1'
+    # UTC时区，比我们东八区早，上面示例为：每周一9点。
+    
+env:
+  TZ: Asia/Shanghai
+  TOCURRENT: false
+  TOREMOTE: true
+  SYNCTAGS: false
+  # 2. Need Change Here!
+  SOURCE_OWNER: Ausaci
+  DEST_OWNER: Namestars
+  
+jobs:
+  sync-current_remote-repo:
+    runs-on: ubuntu-latest
+    if: github.event.sender.id == '54447830' || github.event.repository.owner.id == github.event.sender.id
+    
+    name: Sync ${{ matrix.list }}
+    strategy:
+      fail-fast: false
+      matrix:
+        souce_owner: ${{ env.SOURCE_OWNER }}
+        # 3. Need Change Here!
+        list: [Repo_Test]
+        
+    steps:  
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: repo-sync-current      
+        uses: repo-sync/github-sync@v2
+        if: env.TOCURRENT == 'true'
+        with:
+          source_repo: "https://github.com/${{ matrix.souce_owner }}/${{ matrix.list }}.git"
+          source_branch: "master"
+          destination_branch: "master"
+          sync_tags: "false"
+          github_token: ${{ secrets.PAT }}
+          
+      - name: git-sync-remote-branch
+        uses: wei/git-sync@v3.0.0
+        if: env.TOREMOTE == 'true'
+        with:
+          source_repo: "${{ matrix.souce_owner }}/${{ matrix.list }}"
+          source_branch: "main"
+          #source_branch: "refs/tags/*"
+          destination_repo: "${{ env.DEST_OWNER }}/test"
+          destination_branch: "repo-test"
+          #destination_branch: "refs/tags/*"          
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }} # optional
+          #source_ssh_private_key: ${{ secrets.SOURCE_SSH_PRIVATE_KEY_SOURCE_OWNER }} # optional, will override `SSH_PRIVATE_KEY`
+          destination_ssh_private_key: ${{ secrets.DESTINATION_SSH_PRIVATE_KEY }} # optional, will override `SSH_PRIVATE_KEY`
+          
+      - name: git-sync-remote-tags
+        uses: wei/git-sync@v3.0.0
+        if: env.TOREMOTE == 'true' && env.SYNCTAGS == 'true'
+        with:
+          source_repo: "${{ matrix.souce_owner }}/${{ matrix.list }}"
+          #source_branch: "refs/remotes/source/*"
+          source_branch: "refs/tags/*"
+          destination_repo: "${{ env.DEST_OWNER }}/test"
+          #destination_branch: "refs/heads/*"
+          destination_branch: "refs/tags/*"
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }} # optional
+          #source_ssh_private_key: ${{ secrets.SOURCE_SSH_PRIVATE_KEY_SOURCE_OWNER }} # optional, will override `SSH_PRIVATE_KEY`
+          destination_ssh_private_key: ${{ secrets.DESTINATION_SSH_PRIVATE_KEY }} # optional, will override `SSH_PRIVATE_KEY`
+          
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2.0.1
+        with:          
+          token: ${{ secrets.PAT }}
+          repository: ${{ github.repository }}
+          retain_days: 30
+          keep_minimum_runs: 1
+          
