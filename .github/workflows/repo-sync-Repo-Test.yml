@@ -2,7 +2,7 @@
 # Need add secrets.PAT
 
 # 1. Need Change Here!
-name: repo-sync-Repo_Test
+name: repo-sync-zzChangeMe-single
 on:
   workflow_dispatch:
  # schedule:
@@ -14,8 +14,11 @@ env:
   TOCURRENT: false
   TOREMOTE: true
   SYNCTAGS: false
+  LISTARRAY: false
+  # 4. Add addtional source owner and source repo
+  INCLUDE: true
   # 2. Need Change Here!
-  SOURCE_OWNER: Ausaci
+  SOURCE_OWNER: ChangeMe
   DEST_OWNER: Namestars
   
 jobs:
@@ -27,9 +30,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        souce_owner: [${{ env.SOURCE_OWNER }}]
         # 3. Need Change Here!
-        list: [Repo_Test]
+        list: [ChangeMe]
+        
+        # 4. Add addtional source owner and source repo
+        include:
+          # - { souce_owner: "source_owner", list: "repo" }
+          - { souce_owner: "Ausaci", list: "Repo_Test" }
         
     steps:  
       - uses: actions/checkout@v2
@@ -40,7 +47,7 @@ jobs:
         uses: repo-sync/github-sync@v2
         if: env.TOCURRENT == 'true'
         with:
-          source_repo: "https://github.com/${{ matrix.souce_owner }}/${{ matrix.list }}.git"
+          source_repo: "https://github.com/${{ env.SOURCE_OWNER }}/${{ matrix.list }}.git"
           source_branch: "master"
           destination_branch: "master"
           sync_tags: "false"
@@ -48,13 +55,13 @@ jobs:
           
       - name: git-sync-remote-branch
         uses: wei/git-sync@v3.0.0
-        if: env.TOREMOTE == 'true'
+        if: env.TOREMOTE == 'true' && env.LISTARRAY == 'true'
         with:
-          source_repo: "${{ matrix.souce_owner }}/${{ matrix.list }}"
-          source_branch: "main"
+          source_repo: "${{ env.SOURCE_OWNER }}/${{ matrix.list }}"
+          source_branch: "refs/remotes/source/*"
           #source_branch: "refs/tags/*"
-          destination_repo: "${{ env.DEST_OWNER }}/test"
-          destination_branch: "repo-test"
+          destination_repo: "${{ env.DEST_OWNER }}/${{ env.SOURCE_OWNER }}_${{ matrix.list }}"
+          destination_branch: "refs/heads/*"
           #destination_branch: "refs/tags/*"          
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }} # optional
           #source_ssh_private_key: ${{ secrets.SOURCE_SSH_PRIVATE_KEY_SOURCE_OWNER }} # optional, will override `SSH_PRIVATE_KEY`
@@ -62,12 +69,40 @@ jobs:
           
       - name: git-sync-remote-tags
         uses: wei/git-sync@v3.0.0
-        if: env.TOREMOTE == 'true' && env.SYNCTAGS == 'true'
+        if: env.TOREMOTE == 'true' && env.SYNCTAGS == 'true' && env.LISTARRAY == 'true'
+        with:
+          source_repo: "${{ env.SOURCE_OWNER }}/${{ matrix.list }}"
+          #source_branch: "refs/remotes/source/*"
+          source_branch: "refs/tags/*"
+          destination_repo: "${{ env.DEST_OWNER }}/${{ env.SOURCE_OWNER }}_${{ matrix.list }}"
+          #destination_branch: "refs/heads/*"
+          destination_branch: "refs/tags/*"
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }} # optional
+          #source_ssh_private_key: ${{ secrets.SOURCE_SSH_PRIVATE_KEY_SOURCE_OWNER }} # optional, will override `SSH_PRIVATE_KEY`
+          destination_ssh_private_key: ${{ secrets.DESTINATION_SSH_PRIVATE_KEY }} # optional, will override `SSH_PRIVATE_KEY`
+          
+      - name: git-sync-remote-branch
+        uses: wei/git-sync@v3.0.0
+        if: env.TOREMOTE == 'true' && env.INCLUDE == 'true'
+        with:
+          source_repo: "${{ matrix.souce_owner }}/${{ matrix.list }}"
+          source_branch: "main"
+          #source_branch: "refs/tags/*"
+          destination_repo: "${{ env.DEST_OWNER }}/test"
+          destination_branch: "Repo_Test"
+          #destination_branch: "refs/tags/*"          
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }} # optional
+          #source_ssh_private_key: ${{ secrets.SOURCE_SSH_PRIVATE_KEY_SOURCE_OWNER }} # optional, will override `SSH_PRIVATE_KEY`
+          destination_ssh_private_key: ${{ secrets.DESTINATION_SSH_PRIVATE_KEY }} # optional, will override `SSH_PRIVATE_KEY`
+          
+      - name: git-sync-remote-tags
+        uses: wei/git-sync@v3.0.0
+        if: env.TOREMOTE == 'true' && env.SYNCTAGS == 'true' && env.INCLUDE == 'true'
         with:
           source_repo: "${{ matrix.souce_owner }}/${{ matrix.list }}"
           #source_branch: "refs/remotes/source/*"
           source_branch: "refs/tags/*"
-          destination_repo: "${{ env.DEST_OWNER }}/test"
+          destination_repo: "${{ env.DEST_OWNER }}/${{ matrix.souce_owner }}_${{ matrix.list }}"
           #destination_branch: "refs/heads/*"
           destination_branch: "refs/tags/*"
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }} # optional
