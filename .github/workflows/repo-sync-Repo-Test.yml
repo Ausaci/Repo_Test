@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        souce_owner: ${{ env.SOURCE_OWNER }}
+        souce_owner: [env.SOURCE_OWNER]
         # 3. Need Change Here!
         list: [Repo_Test]
         
