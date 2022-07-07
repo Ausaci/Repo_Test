@@ -1,6 +1,6 @@
 # File: .github/workflows/repo-sync.yml
 
-name: repo-sync
+name: repo-sync-HoldOnBro
 on:
   workflow_dispatch:
  # schedule:
