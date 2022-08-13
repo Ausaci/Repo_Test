@@ -1,29 +1,38 @@
-name: Delete-workflow-runs
+name: Delete workflow runs
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: 0 16 1 * *
-    # UTC 时区，比北京时间慢 8 个小时，示例为 “北京时间每天0点”
+  #schedule:
+    #- cron: '00 16 * * *'
 
 env:
-
   TZ: Asia/Shanghai
   DEL_FLOW: true
-  DEL_FLOW_ACT: Mattraks/delete-workflow-runs
-  DEL_FLOW_ACT_VER: v2.0.3
-  # 不要带 http:// 或者 https:// 等地址前缀
-
+  USE_SSH: true
+  
 jobs:
   delete:
     runs-on: ubuntu-latest
+    if: github.event.sender.id == '54447830' || github.event.repository.owner.id == github.event.sender.id
+    
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-                
+      - uses: actions/checkout@v2
+        with:
+            persist-credentials: false
+       
+      - name: Initial environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo timedatectl set-timezone "$TZ"
+          git config --global user.name 'GitHub Actions' 
+          git config --global user.email 'noreply@github.com'
+        
       - name: Delete workflow runs
         if: env.DEL_FLOW == 'true'
-        uses: env.DEL_FLOW_ACT@env.DEL_FLOW_ACT_VER
-        with:
-          retain_days: 30
-          keep_minimum_runs: 15
+        uses: Mattraks/delete-workflow-runs@v2.0.3
+        with:          
+          token: ${{ secrets.PAT }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 1
