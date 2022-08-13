@@ -10,7 +10,8 @@ env:
 
   TZ: Asia/Shanghai
   DEL_FLOW: true
-  DEL_FLOW_ACT: Mattraks/delete-workflow-runs@v2.0.3
+  DEL_FLOW_ACT: Mattraks/delete-workflow-runs
+  DEL_FLOW_ACT_VER: v2.0.3
   # 不要带 http:// 或者 https:// 等地址前缀
 
 jobs:
@@ -22,7 +23,7 @@ jobs:
                 
       - name: Delete workflow runs
         if: env.DEL_FLOW == 'true'
-        uses: env.DEL_FLOW_ACT
+        uses: env.DEL_FLOW_ACT@env.DEL_FLOW_ACT_VER
         with:
           retain_days: 30
           keep_minimum_runs: 15
