@@ -1,0 +1,18 @@
+# Examples:
+# ||example.org^:阻止 example.org 域名及其所有子域名；
+# @@||example.org^:解除 example.org 及其所有子域名的封锁；
+# 127.0.0.1 example.org:对 example.org（不包括它的子域名）以 127.0.0.1 作为响应；
+# ! 这是一行注释。:只是一条注释；
+# # 这也是一行注释。:只是一条注释；
+# /REGEX/:阻止访问与指定的正则表达式匹配的域名。
+
+@@||ausaci.xyz^
+@@||ausaci.cf^
+@@||hydrogel.cf^
+@@||iecup.cf^
+@@||gcore.com^$important
+@@||tjupt.org^$important
+@@||ablesci.com^$important
+@@||wgong1.top^$important
+@@||node-for-bigairport.win^$important
+@@||jafiyun.world^$important
