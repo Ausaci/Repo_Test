@@ -7,6 +7,7 @@
 # /REGEX/:阻止访问与指定的正则表达式匹配的域名。
 
 @@||ausaci.xyz^
+@@||021529.xyz^
 @@||ausaci.cf^
 @@||hydrogel.cf^
 @@||iecup.cf^
