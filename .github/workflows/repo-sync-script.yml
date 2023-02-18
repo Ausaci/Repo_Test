@@ -30,7 +30,8 @@ jobs:
           persist-credentials: false
           
       - name: git-sync-remote
-        env: DEST_SSH_KEY: ${{ secrets.SYNC_DEST_SSH_PRIVATE_KEY }}
+        env:
+          DEST_SSH_KEY: ${{ secrets.SYNC_DEST_SSH_PRIVATE_KEY }}
         run: |
           # sudo apt-get update
           # sudo apt-get install dos2unix
