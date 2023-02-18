@@ -31,20 +31,20 @@ jobs:
           
       - name: git-sync-remote
         run: |
-        cd $GITHUB_WORKSPACE/sync-repo/git-sync
-        docker build -t git-sync:dev_tag -q .
-        cd $GITHUB_WORKSPACE/sync-repo
-        pwd
-        echo "DATE=$(date "+%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
-        echo "SOURCE_TOKEN=${{ secrets.SYNC_SOURCE_TOKEN }}" >> $GITHUB_ENV # Can be empty
-        echo "DEST_OWNER=${{ secrets.SYNC_DEST_OWNER }}" >> $GITHUB_ENV # Required
-        echo "DEST_OWNER_EMAIL=${{ secrets.SYNC_DEST_OWNER_EMAIL }}" >> $GITHUB_ENV # Required
-        echo "DEST_TOKEN=${{ secrets.SYNC_DEST_TOKEN }}" >> $GITHUB_ENV # Required
-        # echo "DEST_SSH_PRIVATE_KEY_PATH=${{ secrets.SYNC }}" >> $GITHUB_ENV # Required
-        echo "DEST_SSH_PRIVATE_KEY=${{ secrets.SYNC_DEST_SSH_PRIVATE_KEY }}" >> $GITHUB_ENV # Required # $(cat ${DEST_SSH_PRIVATE_KEY_PATH})
-        bash sync-repo.sh
-        # cat ${REPO_MATRIX_FILE}
-        # rm -rf ${FUN_LOG} ${REPO_MATRIX_FILE} ${JSONDIR} ${WIKIDIR}
+          cd $GITHUB_WORKSPACE/sync-repo/git-sync
+          docker build -t git-sync:dev_tag -q .
+          cd $GITHUB_WORKSPACE/sync-repo
+          pwd
+          echo "DATE=$(date "+%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
+          echo "SOURCE_TOKEN=${{ secrets.SYNC_SOURCE_TOKEN }}" >> $GITHUB_ENV # Can be empty
+          echo "DEST_OWNER=${{ secrets.SYNC_DEST_OWNER }}" >> $GITHUB_ENV # Required
+          echo "DEST_OWNER_EMAIL=${{ secrets.SYNC_DEST_OWNER_EMAIL }}" >> $GITHUB_ENV # Required
+          echo "DEST_TOKEN=${{ secrets.SYNC_DEST_TOKEN }}" >> $GITHUB_ENV # Required
+          # echo "DEST_SSH_PRIVATE_KEY_PATH=${{ secrets.SYNC }}" >> $GITHUB_ENV # Required
+          echo "DEST_SSH_PRIVATE_KEY=${{ secrets.SYNC_DEST_SSH_PRIVATE_KEY }}" >> $GITHUB_ENV # Required # $(cat ${DEST_SSH_PRIVATE_KEY_PATH})
+          bash sync-repo.sh
+          # cat ${REPO_MATRIX_FILE}
+          # rm -rf ${FUN_LOG} ${REPO_MATRIX_FILE} ${JSONDIR} ${WIKIDIR}
 
       - name: Telegram notification
         uses: appleboy/telegram-action@master
