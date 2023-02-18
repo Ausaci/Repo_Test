@@ -44,26 +44,14 @@ REPO_MATRIX_FILE="${WORKDIR}/GH_Matrix_List.txt"
 ## ENV End ##
 
 # remove files if existed
-for file in ${LOG_FILE} ${FUN_LOG} ${REPO_MATRIX_FILE}
-do
-  if [ -f "${file}" ]; then
-    rm "${file}"
-  fi
-done
 
 echo "$(date +"%Y-%m-%d %H:%M:%S Update Begin")"
 
 # Load customized env file
-if [ -f "${ENV_FILE}" ];then
-    echo "Loading customized env file ... "
-    source ${ENV_FILE}
-    echo "Load customized env file successfully!"
-fi
-
 
 mkdir -p ${WORKDIR}/${DEST_OWNER}
 sed '/Source/d' ${WORKDIR}/${INPUT_CSV_FILE} > ${TEMP_INPUT_CSV_FILE} 2>&1
-dos2unix ${ENV_FILE} ${WORKDIR}/${INPUT_CSV_FILE} ${TEMP_INPUT_CSV_FILE} # ${REPO_MATRIX_FILE} 
+dos2unix ${WORKDIR}/${INPUT_CSV_FILE} ${TEMP_INPUT_CSV_FILE} # ${REPO_MATRIX_FILE} 
 
 # get source repo infomation
 fun_get_repo_info(){
