@@ -51,7 +51,6 @@ echo "$(date +"%Y-%m-%d %H:%M:%S Update Begin")"
 
 mkdir -p ${WORKDIR}/${DEST_OWNER}
 sed '/Source/d' ${WORKDIR}/${INPUT_CSV_FILE} > ${TEMP_INPUT_CSV_FILE} 2>&1
-dos2unix ${WORKDIR}/${INPUT_CSV_FILE} ${TEMP_INPUT_CSV_FILE} # ${REPO_MATRIX_FILE} 
 
 # get source repo infomation
 fun_get_repo_info(){
