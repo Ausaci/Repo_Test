@@ -16,7 +16,7 @@ jobs:
     if: github.event.sender.id == '54447830' || github.event.repository.owner.id == github.event.sender.id
     
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
             persist-credentials: false
        
