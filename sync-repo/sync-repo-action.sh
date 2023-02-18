@@ -125,13 +125,13 @@ fun_sync_dest_repo(){
 
 # sync repo with all branch
 if [[ ${SYNC_REPO} == "true" ]]; then
-    docker run --rm -e "DESTINATION_SSH_PRIVATE_KEY=${DEST_SSH_PRIVATE_KEY}" --name sync-repo-branches git-sync:latest \
+    sudo docker run --rm -e "DESTINATION_SSH_PRIVATE_KEY=${DEST_SSH_PRIVATE_KEY}" --name sync-repo-branches git-sync:latest \
         ${REPO2} ${SOURCE_BRANCH} ${REPO1} ${DEST_BRANCH}
 fi
 
 # sync tags
 if [[ ${SYNC_TAG} == "true" ]]; then
-    docker run --rm -e "DESTINATION_SSH_PRIVATE_KEY=${DEST_SSH_PRIVATE_KEY}" --name sync-repo-tags git-sync:latest \
+    sudo docker run --rm -e "DESTINATION_SSH_PRIVATE_KEY=${DEST_SSH_PRIVATE_KEY}" --name sync-repo-tags git-sync:latest \
         ${REPO2} ${SOURCE_BRANCH_TAG} ${REPO1} ${DEST_BRANCH_TAG}
 fi
 
@@ -142,10 +142,10 @@ fun_sync_dest_repo_dev_tag(){
 # docker build -t git-sync:dev_tag -q .
 
 if [[ ${SYNC_REPO} == "true" && ${SYNC_TAG} == "true" ]]; then
-    docker run --rm -e "DESTINATION_SSH_PRIVATE_KEY=${DEST_SSH_PRIVATE_KEY}" -e "SOURCE_BRANCH_TAG=${SOURCE_BRANCH_TAG}" -e "DESTINATION_BRANCH_TAG=${DEST_BRANCH_TAG}" --name sync-repo-branch-tag git-sync:dev_tag \
+    sudo docker run --rm -e "DESTINATION_SSH_PRIVATE_KEY=${DEST_SSH_PRIVATE_KEY}" -e "SOURCE_BRANCH_TAG=${SOURCE_BRANCH_TAG}" -e "DESTINATION_BRANCH_TAG=${DEST_BRANCH_TAG}" --name sync-repo-branch-tag git-sync:dev_tag \
         ${REPO2} ${SOURCE_BRANCH} ${REPO1} ${DEST_BRANCH}
 elif [[ ${SYNC_REPO} == "true" && ${SYNC_TAG} != "true" ]]; then
-    docker run --rm -e "DESTINATION_SSH_PRIVATE_KEY=${DEST_SSH_PRIVATE_KEY}" --name sync-repo-branch-tag git-sync:dev_tag \
+    sudo docker run --rm -e "DESTINATION_SSH_PRIVATE_KEY=${DEST_SSH_PRIVATE_KEY}" --name sync-repo-branch-tag git-sync:dev_tag \
         ${REPO2} ${SOURCE_BRANCH} ${REPO1} ${DEST_BRANCH}
 else
     echo "Will NOT Sync Branches and Tags of ${DEST_REPO} ..."
