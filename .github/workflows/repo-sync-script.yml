@@ -30,6 +30,7 @@ jobs:
           persist-credentials: false
           
       - name: git-sync-remote
+        env: DEST_SSH_KEY: ${{ secrets.SYNC_DEST_SSH_PRIVATE_KEY }}
         run: |
           # sudo apt-get update
           # sudo apt-get install dos2unix
@@ -39,7 +40,7 @@ jobs:
           cd $GITHUB_WORKSPACE/sync-repo
           pwd
           ls
-          # ./sync-repo.sh ${{ secrets.SYNC_SOURCE_TOKEN }} ${{ secrets.SYNC_DEST_OWNER }} ${{ secrets.SYNC_DEST_OWNER_EMAIL }} ${{ secrets.SYNC_DEST_TOKEN }} ${{ secrets.SYNC_DEST_SSH_PRIVATE_KEY }}
+          # ./sync-repo.sh ${{ secrets.SYNC_SOURCE_TOKEN }} ${{ secrets.SYNC_DEST_OWNER }} ${{ secrets.SYNC_DEST_OWNER_EMAIL }} ${{ secrets.SYNC_DEST_TOKEN }} ${DEST_SSH_KEY}
           # cat ${REPO_MATRIX_FILE}
           # rm -rf ${FUN_LOG} ${REPO_MATRIX_FILE} ${JSONDIR} ${WIKIDIR}
 
