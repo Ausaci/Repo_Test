@@ -1,0 +1,65 @@
+# File: .github/workflows/sync-souce-owner-repo-template.yml
+# Need add secrets.PAT
+
+# 1. Need Change Here!
+name: repo-sync-by-script
+on:
+  workflow_dispatch:
+ # schedule:
+   # - cron: '0 1 * * 1'
+    # UTC时区，比我们东八区早，上面示例为：每周一9点。
+    
+env:
+  TZ: Asia/Shanghai
+  TOCURRENT: false
+  TOREMOTE: true
+  SYNCTAGS: false
+  LISTARRAY: false
+  # 2. Need Change Here!
+  # SOURCE_OWNER: ChangeMe
+  # DEST_OWNER: Namestars
+  
+jobs:
+  sync-remote-repo:
+    runs-on: ubuntu-latest
+    if: github.event.sender.id == '54447830' || github.event.repository.owner.id == github.event.sender.id
+        
+    steps:  
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          
+      - name: git-sync-remote
+        run: |
+        cd $GITHUB_WORKSPACE/sync-repo/git-sync
+        docker build -t git-sync:dev_tag -q .
+        cd $GITHUB_WORKSPACE/sync-repo
+        pwd
+        echo "DATE=$(date "+%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
+        echo "SOURCE_TOKEN=${{ secrets.SYNC_SOURCE_TOKEN }}" >> $GITHUB_ENV # Can be empty
+        echo "DEST_OWNER=${{ secrets.SYNC_DEST_OWNER }}" >> $GITHUB_ENV # Required
+        echo "DEST_OWNER_EMAIL=${{ secrets.SYNC_DEST_OWNER_EMAIL }}" >> $GITHUB_ENV # Required
+        echo "DEST_TOKEN=${{ secrets.SYNC_DEST_TOKEN }}" >> $GITHUB_ENV # Required
+        # echo "DEST_SSH_PRIVATE_KEY_PATH=${{ secrets.SYNC }}" >> $GITHUB_ENV # Required
+        echo "DEST_SSH_PRIVATE_KEY=${{ secrets.SYNC_DEST_SSH_PRIVATE_KEY }}" >> $GITHUB_ENV # Required # $(cat ${DEST_SSH_PRIVATE_KEY_PATH})
+        bash sync-repo.sh
+        # cat ${REPO_MATRIX_FILE}
+        # rm -rf ${FUN_LOG} ${REPO_MATRIX_FILE} ${JSONDIR} ${WIKIDIR}
+
+      - name: Telegram notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: |
+            同步时间：${{ env.DATE }}
+            已使用 Github 更新完成
+        
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2.0.1
+        with:          
+          token: ${{ secrets.PAT }}
+          repository: ${{ github.repository }}
+          retain_days: 7
+          keep_minimum_runs: 1
+          
