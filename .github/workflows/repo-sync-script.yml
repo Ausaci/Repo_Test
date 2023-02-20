@@ -46,6 +46,7 @@ jobs:
           pwd
           ls
           dos2unix *.sh *.CSV
+          chmod 755 *.sh
           sudo ./1.sh
           # sudo ./sync-repo-action.sh ${SYNC_SOURCE_TOKEN} ${SYNC_DEST_OWNER} ${SYNC_DEST_TOKEN} ${DEST_SSH_KEY}
           # cat ${REPO_MATRIX_FILE}
