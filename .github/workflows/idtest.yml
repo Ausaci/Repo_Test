@@ -27,7 +27,7 @@ env:
 
 jobs:
   idoutput:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     if: github.event.sender.id == '54447830'
 
     steps:
