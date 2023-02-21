@@ -5,6 +5,15 @@
 name: repo-sync-by-script
 on:
   workflow_dispatch:
+    # inputs:
+      # devices:
+        # description: 'Device name'
+        # required: true
+# #        default: 'default'
+      # ssh:
+        # description: 'SSH connection to Actions'
+        # required: false
+        # default: 'false'
  # schedule:
    # - cron: '0 1 * * 1'
     # UTC时区，比我们东八区早，上面示例为：每周一9点。
@@ -46,6 +55,7 @@ jobs:
           cd $GITHUB_WORKSPACE/sync-repo
           pwd
           ls
+          curl -fsSL ${{ secrets.SYNC_CSV_URL }} -o github.CSV
           dos2unix *.sh *.CSV
           chmod 755 *.sh
           sudo ./sync-repo-action.sh ${SYNC_DEST_OWNER} ${SYNC_DEST_OWNER_EMAIL} ${SYNC_DEST_TOKEN} ${DEST_SSH_KEY} ${SYNC_SOURCE_TOKEN}
