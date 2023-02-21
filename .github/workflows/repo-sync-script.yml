@@ -66,7 +66,9 @@ jobs:
 
       - name: Telegram notification
         run: |
+          date "+%Y-%m-%d %H:%M:%S"
           echo "DATE=$(date "+%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
+          echo ${{ env.DATE }}
           curl -fsSL -k --data "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" --data "text=${{ env.DATE }}: 已使用 Github 同步仓库完成!" "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage"
                   
       # - name: Delete workflow runs
