@@ -49,7 +49,6 @@ jobs:
           dos2unix *.sh *.CSV
           chmod 755 *.sh
           sudo ./sync-repo-action.sh ${SYNC_DEST_OWNER} ${SYNC_DEST_OWNER_EMAIL} ${SYNC_DEST_TOKEN} ${DEST_SSH_KEY} ${SYNC_SOURCE_TOKEN}
-          # ${{ env.SYNC_DEST_OWNER }} ${{ env.SYNC_DEST_OWNER_EMAIL }} ${{ env.SYNC_DEST_TOKEN }} ${{ env.DEST_SSH_KEY }} ${{ env.SYNC_SOURCE_TOKEN }}
           # cat ${REPO_MATRIX_FILE}
           # rm -rf ${FUN_LOG} ${REPO_MATRIX_FILE} ${JSONDIR} ${WIKIDIR}
 
