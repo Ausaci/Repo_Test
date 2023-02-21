@@ -14,12 +14,12 @@ SYNC_WIKI="false"
 UPDATE_DEFAULT_BRANCH="false"
 
 # TOKEN & SSH Key #
-SOURCE_TOKEN="$5" 
+SOURCE_TOKEN="$4" 
 DEST_OWNER="$1" # Required
 DEST_OWNER_EMAIL="$2" # Required
 DEST_TOKEN="$3" # Required
 DEST_SSH_PRIVATE_KEY_PATH="" # Required
-DEST_SSH_PRIVATE_KEY="$4" # Required
+DEST_SSH_PRIVATE_KEY="$(cat dest_id)" # Required
 DEST_WIKI_REPO="REPOS_WIKI" # Required # WIKI
 
 # Sync selected branch & tag name #

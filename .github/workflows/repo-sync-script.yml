@@ -44,7 +44,7 @@ jobs:
           SYNC_DEST_OWNER: ${{ secrets.SYNC_DEST_OWNER }}
           SYNC_DEST_OWNER_EMAIL: ${{ secrets.SYNC_DEST_OWNER_EMAIL }}
           SYNC_DEST_TOKEN: ${{ secrets.SYNC_DEST_TOKEN }}
-          DEST_SSH_KEY: ${{ secrets.SYNC_DEST_SSH_PRIVATE_KEY }}
+          # DEST_SSH_KEY: ${{ secrets.SYNC_DEST_SSH_PRIVATE_KEY }}
         run: |
           sudo apt-get update
           sudo apt-get install dos2unix
@@ -53,12 +53,13 @@ jobs:
           docker build -t git-sync:dev_tag -q .
           echo "docker build successfuly"
           cd $GITHUB_WORKSPACE/sync-repo
+          echo "${{ secrets.SYNC_DEST_SSH_PRIVATE_KEY }}" | sed 's/\\n/\n/g' > dest_id
           pwd
           ls
           curl -fsSL ${{ secrets.SYNC_CSV_URL }} -o github.CSV
           dos2unix *.sh *.CSV
           chmod 755 *.sh
-          sudo ./sync-repo-action.sh ${SYNC_DEST_OWNER} ${SYNC_DEST_OWNER_EMAIL} ${SYNC_DEST_TOKEN} ${{ env.DEST_SSH_KEY }} ${SYNC_SOURCE_TOKEN}
+          sudo ./sync-repo-action.sh ${SYNC_DEST_OWNER} ${SYNC_DEST_OWNER_EMAIL} ${SYNC_DEST_TOKEN} ${SYNC_SOURCE_TOKEN}
           # cat ${REPO_MATRIX_FILE}
           # rm -rf ${FUN_LOG} ${REPO_MATRIX_FILE} ${JSONDIR} ${WIKIDIR}
 
