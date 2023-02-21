@@ -44,7 +44,7 @@ jobs:
           SYNC_DEST_OWNER: ${{ secrets.SYNC_DEST_OWNER }}
           SYNC_DEST_OWNER_EMAIL: ${{ secrets.SYNC_DEST_OWNER_EMAIL }}
           SYNC_DEST_TOKEN: ${{ secrets.SYNC_DEST_TOKEN }}
-          DEST_SSH_KEY: ${{ secrets.DESTINATION_SSH_PRIVATE_KEY }}
+          DEST_SSH_KEY: ${{ secrets.SYNC_DEST_SSH_PRIVATE_KEY }}
         run: |
           sudo apt-get update
           sudo apt-get install dos2unix
