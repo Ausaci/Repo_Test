@@ -58,7 +58,7 @@ jobs:
           curl -fsSL ${{ secrets.SYNC_CSV_URL }} -o github.CSV
           dos2unix *.sh *.CSV
           chmod 755 *.sh
-          sudo ./sync-repo-action.sh ${SYNC_DEST_OWNER} ${SYNC_DEST_OWNER_EMAIL} ${SYNC_DEST_TOKEN} ${DEST_SSH_KEY} ${SYNC_SOURCE_TOKEN}
+          sudo ./sync-repo-action.sh ${SYNC_DEST_OWNER} ${SYNC_DEST_OWNER_EMAIL} ${SYNC_DEST_TOKEN} ${{ env.DEST_SSH_KEY }} ${SYNC_SOURCE_TOKEN}
           # cat ${REPO_MATRIX_FILE}
           # rm -rf ${FUN_LOG} ${REPO_MATRIX_FILE} ${JSONDIR} ${WIKIDIR}
 
