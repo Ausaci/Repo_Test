@@ -40,6 +40,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install dos2unix
           cd $GITHUB_WORKSPACE/sync-repo/git-sync
+          chmod 755 *.sh *.yml
           docker build -t git-sync:dev_tag -q .
           echo "docker build successfuly"
           cd $GITHUB_WORKSPACE/sync-repo
@@ -47,7 +48,7 @@ jobs:
           ls
           dos2unix *.sh *.CSV
           chmod 755 *.sh
-          sudo ./sync-repo-action.sh ${SYNC_SOURCE_TOKEN} ${SYNC_DEST_OWNER} ${SYNC_DEST_TOKEN} ${DEST_SSH_KEY}
+          sudo ./sync-repo-action.sh ${SYNC_DEST_OWNER} ${SYNC_DEST_TOKEN} ${DEST_SSH_KEY} ${SYNC_SOURCE_TOKEN}
           # cat ${REPO_MATRIX_FILE}
           # rm -rf ${FUN_LOG} ${REPO_MATRIX_FILE} ${JSONDIR} ${WIKIDIR}
 
