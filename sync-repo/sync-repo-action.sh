@@ -237,8 +237,23 @@ done < ${TEMP_INPUT_CSV_FILE}
 
 fun_push_dest_repo
 
-cat ${REPO_MATRIX_FILE}
-rm -rf ${FUN_LOG} ${REPO_MATRIX_FILE} ${JSONDIR} ${WIKIDIR}
+if [ -f "${REPO_MATRIX_FILE}" ]; then
+    cat ${REPO_MATRIX_FILE}
+fi
+
+for file in ${FUN_LOG} ${REPO_MATRIX_FILE}
+do
+    if [ -f "${file}" ]; then
+        rm -rf ${file}
+    fi
+done
+
+for folder in ${JSONDIR} ${WIKIDIR}
+do
+    if [ -d "${folder}" ]; then
+        rm -rf ${folder}
+    fi
+done
 
 echo "$(date +"%Y-%m-%d %H:%M:%S Update End")"
 
