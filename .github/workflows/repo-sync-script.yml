@@ -53,7 +53,7 @@ jobs:
           docker build -t git-sync:dev_tag -q .
           echo "docker build successfuly"
           cd $GITHUB_WORKSPACE/sync-repo
-          echo "${{ secrets.SYNC_DEST_SSH_PRIVATE_KEY }}" | sed 's/\\n/\n/g' > dest_id
+          echo -e "${{ secrets.SYNC_DEST_SSH_PRIVATE_KEY }}" | sed 's/\\n/\n/g' > dest_id
           pwd
           ls
           curl -fsSL ${{ secrets.SYNC_CSV_URL }} -o github.CSV
