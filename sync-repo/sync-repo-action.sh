@@ -5,9 +5,9 @@
 # Github REST API Version #
 GH_API_VERSION="2022-11-28"
 
-# Function controller #
+# Function controller # true false
 CREATE_REPO="false"
-CREATE_RELEASE="false"
+CREATE_RELEASE="true"
 SYNC_REPO="true"
 SYNC_TAG="true"
 SYNC_WIKI="false"
