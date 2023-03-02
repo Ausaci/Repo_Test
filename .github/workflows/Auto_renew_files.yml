@@ -17,8 +17,8 @@ name: Auto renew files
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: 0 16 1 * *
+  # schedule:
+    # - cron: 0 16 1 * *
     # UTC 时区，比北京时间慢 8 个小时，示例为 “北京时间每天0点”
 
 env:
