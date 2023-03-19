@@ -13,6 +13,9 @@ release_id_api_url = "https://api.github.com/repos/{}/{}/releases/{}"
 TEMP_INPUT_CSV_FILE = "github.CSV"
 
 # Set the username, repository name, and authentication token
+
+os.environ
+
 dest_owner = os.environ['SYNC_DEST_OWNER']
 access_token = os.environ.get['SYNC_DEST_TOKEN']
 release_feature = os.environ.get['SYNC_RELEASE_FEAT']

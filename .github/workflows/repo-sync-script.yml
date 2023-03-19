@@ -55,6 +55,7 @@ jobs:
           curl -fsSL ${{ secrets.SYNC_CSV_URL }} -o github.CSV
           dos2unix *.sh *.py *.CSV
           chmod 755 *.sh *.py
+          env
 
       - name: git-sync-remote
         if: github.event.inputs.is_sync_repo == 'true' && github.event.inputs.is_sync_repo  != 'false'
