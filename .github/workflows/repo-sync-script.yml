@@ -55,7 +55,7 @@ jobs:
           curl -fsSL ${{ secrets.SYNC_CSV_URL }} -o github.CSV
           dos2unix *.sh *.py *.CSV
           chmod 755 *.sh *.py
-          env
+          # env
 
       - name: git-sync-remote
         if: github.event.inputs.is_sync_repo == 'true' && github.event.inputs.is_sync_repo  != 'false'
@@ -73,6 +73,10 @@ jobs:
 
       - name: Delete releases
         if: github.event.inputs.is_delete_releases == 'true' && github.event.inputs.is_delete_releases  != 'false'
+        env:
+          SYNC_DEST_OWNER: ${{ secrets.SYNC_DEST_OWNER }}
+          SYNC_DEST_TOKEN: ${{ secrets.SYNC_DEST_TOKEN }}
+          SYNC_RELEASE_FEAT: ${{ secrets.SYNC_RELEASE_FEAT }}
         run: |
           cd $GITHUB_WORKSPACE/sync-repo
           pwd
