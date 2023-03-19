@@ -44,12 +44,21 @@ jobs:
       - uses: actions/checkout@v3
         with:
           persist-credentials: false
-          
-      - name: git-sync-remote
-        if: github.event.inputs.is_sync_repo == 'true' && github.event.inputs.is_sync_repo  != 'false'
+
+      - name: Initiate Environment
         run: |
           sudo apt-get update
           sudo apt-get install dos2unix
+          cd $GITHUB_WORKSPACE/sync-repo
+          pwd
+          ls
+          curl -fsSL ${{ secrets.SYNC_CSV_URL }} -o github.CSV
+          dos2unix *.sh *.py *.CSV
+          chmod 755 *.sh *.py
+
+      - name: git-sync-remote
+        if: github.event.inputs.is_sync_repo == 'true' && github.event.inputs.is_sync_repo  != 'false'
+        run: |
           cd $GITHUB_WORKSPACE/sync-repo/git-sync
           chmod 755 *.sh *.yml
           docker build -t git-sync:dev_tag -q .
@@ -58,11 +67,8 @@ jobs:
           echo -e "${{ secrets.SYNC_DEST_SSH_PRIVATE_KEY }}" | sed 's/\\n/\n/g' > dest_id
           pwd
           ls
-          curl -fsSL ${{ secrets.SYNC_CSV_URL }} -o github.CSV
-          dos2unix *.sh *.CSV
-          chmod 755 *.sh
           sudo ./sync-repo-action.sh ${SYNC_DEST_OWNER} ${SYNC_DEST_OWNER_EMAIL} ${SYNC_DEST_TOKEN} ${SYNC_SOURCE_TOKEN}
-
+          rm -rf dest_id
 
       - name: Delete releases
         if: github.event.inputs.is_delete_releases == 'true' && github.event.inputs.is_delete_releases  != 'false'
@@ -71,11 +77,11 @@ jobs:
           pwd
           ls
           sudo python3 delete_older_releases_action.py
-          
 
       - name: Telegram notification
         run: |
-          rm -rf dest_id *.CSV
+          cd $GITHUB_WORKSPACE/sync-repo
+          rm -rf *.CSV
           # cat ${REPO_MATRIX_FILE}
           # rm -rf ${FUN_LOG} ${REPO_MATRIX_FILE} ${JSONDIR} ${WIKIDIR}
           
