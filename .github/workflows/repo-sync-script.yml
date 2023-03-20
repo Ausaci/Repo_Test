@@ -71,12 +71,14 @@ jobs:
           sudo ./sync-repo-action.sh ${SYNC_DEST_OWNER} ${SYNC_DEST_OWNER_EMAIL} ${SYNC_DEST_TOKEN} ${SYNC_SOURCE_TOKEN}
           rm -rf dest_id
 
+      - name: Set up Python
+        if: github.event.inputs.is_delete_releases == 'true' && github.event.inputs.is_delete_releases  != 'false'
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
       - name: Delete releases
         if: github.event.inputs.is_delete_releases == 'true' && github.event.inputs.is_delete_releases  != 'false'
-        env:
-          SYNC_DEST_OWNER: ${{ secrets.SYNC_DEST_OWNER }}
-          SYNC_DEST_TOKEN: ${{ secrets.SYNC_DEST_TOKEN }}
-          SYNC_RELEASE_FEAT: ${{ secrets.SYNC_RELEASE_FEAT }}
         run: |
           cd $GITHUB_WORKSPACE/sync-repo
           pwd
