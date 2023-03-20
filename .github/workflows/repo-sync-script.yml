@@ -85,7 +85,7 @@ jobs:
           env
           pwd
           ls
-          sudo python3 delete_older_releases_action.py
+          python3 delete_older_releases_action.py
 
       - name: Telegram notification
         run: |
