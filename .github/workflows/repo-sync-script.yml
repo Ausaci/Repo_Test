@@ -53,7 +53,7 @@ jobs:
           pwd
           ls
           curl -fsSL ${{ secrets.SYNC_CSV_URL }} -o github.CSV
-          dos2unix *.sh *.py *.CSV
+          dos2unix *.sh *.py *.CSV *.txt
           chmod 755 *.sh *.py
           # env
 
@@ -81,6 +81,8 @@ jobs:
         if: github.event.inputs.is_delete_releases == 'true' && github.event.inputs.is_delete_releases  != 'false'
         run: |
           cd $GITHUB_WORKSPACE/sync-repo
+          # install requirements
+          pip install -r $GITHUB_WORKSPACE/sync-repo/requirements.txt
           export TEST="a test message" SYNC_DEST_OWNER_PY=${SYNC_DEST_OWNER} SYNC_DEST_TOKEN_PY=${SYNC_DEST_TOKEN} SYNC_RELEASE_FEAT_PY=${SYNC_RELEASE_FEAT}
           env
           pwd
