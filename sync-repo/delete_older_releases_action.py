@@ -13,8 +13,8 @@ release_id_api_url = "https://api.github.com/repos/{}/{}/releases/{}"
 TEMP_INPUT_CSV_FILE = "github.CSV"
 
 # Set the username, repository name, and authentication token
-TZ = os.environ.get('TOCURRENT')
-print(TZ)
+ATEST = os.environ.get('TEST')
+print(ATEST)
 abc = os.environ
 print(abc)
 

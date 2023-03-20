@@ -18,28 +18,29 @@ on:
  # schedule:
    # - cron: '0 1 * * 1'
     # UTC时区，比我们东八区早，上面示例为：每周一9点。
-    
-env:
-  TZ: Asia/Shanghai
-  TOCURRENT: false
-  TOREMOTE: true
-  SYNCTAGS: false
-  LISTARRAY: false
-  SYNC_SOURCE_TOKEN: ${{ secrets.SYNC_SOURCE_TOKEN }}
-  SYNC_DEST_OWNER: ${{ secrets.SYNC_DEST_OWNER }}
-  SYNC_DEST_OWNER_EMAIL: ${{ secrets.SYNC_DEST_OWNER_EMAIL }}
-  SYNC_DEST_TOKEN: ${{ secrets.SYNC_DEST_TOKEN }}
-  # DEST_SSH_KEY: ${{ secrets.SYNC_DEST_SSH_PRIVATE_KEY }}
-  SYNC_RELEASE_FEAT: ${{ secrets.SYNC_RELEASE_FEAT }}
-  # 2. Need Change Here!
-  # SOURCE_OWNER: ChangeMe
-  # DEST_OWNER: Namestars
-  
+
 jobs:
   sync-remote-repo:
     runs-on: ubuntu-latest
     if: github.event.sender.id == '54447830' || github.event.repository.owner.id == github.event.sender.id
         
+    env:
+      TZ: Asia/Shanghai
+      TOCURRENT: false
+      TOREMOTE: true
+      SYNCTAGS: false
+      LISTARRAY: false
+      TEST: "a test message"
+      SYNC_SOURCE_TOKEN: ${{ secrets.SYNC_SOURCE_TOKEN }}
+      SYNC_DEST_OWNER: ${{ secrets.SYNC_DEST_OWNER }}
+      SYNC_DEST_OWNER_EMAIL: ${{ secrets.SYNC_DEST_OWNER_EMAIL }}
+      SYNC_DEST_TOKEN: ${{ secrets.SYNC_DEST_TOKEN }}
+      # DEST_SSH_KEY: ${{ secrets.SYNC_DEST_SSH_PRIVATE_KEY }}
+      SYNC_RELEASE_FEAT: ${{ secrets.SYNC_RELEASE_FEAT }}
+      # 2. Need Change Here!
+      # SOURCE_OWNER: ChangeMe
+      # DEST_OWNER: Namestars
+    
     steps:  
       - uses: actions/checkout@v3
         with:
