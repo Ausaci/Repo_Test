@@ -82,6 +82,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/sync-repo
           export TEST="a test message" SYNC_DEST_OWNER_PY=${SYNC_DEST_OWNER} SYNC_DEST_TOKEN_PY=${SYNC_DEST_TOKEN} SYNC_RELEASE_FEAT_PY=${SYNC_RELEASE_FEAT}
+          env
           pwd
           ls
           sudo python3 delete_older_releases_action.py
