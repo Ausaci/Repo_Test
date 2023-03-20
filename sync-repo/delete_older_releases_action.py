@@ -49,9 +49,9 @@ def delete_old_releases(owner, repo, keep_latest, release_feature):
     # Loop through the releases and find the ones that match the release feature
     matching_releases = []
     for release in releases:
-        # if release["tag_name"] == RELEASE_TAG_NAME:
+        # if release["tag_name"] == release_feature:
         # if release["tag_name"].startswith(release_feature):
-        if release["name"] == "Add Tags":
+        if release["name"] == release_feature:
             matching_releases.append(release)
 
     # Sort the matching releases by the creation date (newest first)
