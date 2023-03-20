@@ -18,9 +18,9 @@ print(ATEST)
 abc = os.environ
 print(abc)
 
-dest_owner = os.environ['SYNC_DEST_OWNER']
-access_token = os.environ['SYNC_DEST_TOKEN']
-release_feature = os.environ['SYNC_RELEASE_FEAT']
+dest_owner = os.environ['SYNC_DEST_OWNER_PY']
+access_token = os.environ['SYNC_DEST_TOKEN_PY']
+release_feature = os.environ['SYNC_RELEASE_FEAT_PY']
 keep_latest = 1
 
 # Set the headers to include the authentication token
