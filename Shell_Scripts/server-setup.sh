@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Env
+RED_FONT_PREFIX="\033[31m"
+LIGHT_GREEN_FONT_PREFIX="\033[1;32m"
+FONT_COLOR_SUFFIX="\033[0m"
+INFO="[${LIGHT_GREEN_FONT_PREFIX}INFO${FONT_COLOR_SUFFIX}]"
+ERROR="[${RED_FONT_PREFIX}ERROR${FONT_COLOR_SUFFIX}]"
+[ $EUID != 0 ] && SUDO=sudo
+
 # Define variables
 SSH_SERVICE="ssh"
 SSH_PORT="22"
@@ -20,7 +28,8 @@ function print_usage {
   echo "-n, --set-hostname            Set the hostname"
   echo "--set-proxy                   Set proxy settings on the system"
   echo "--unset-proxy                 Cancel proxy settings on the system"
-  echo "-o, --install-docker          Install Docker and Docker Compose"
+  echo "-o, --install-docker          Install Docker and docker-compose"
+  echo "--install-docker-compose      Install docker-compose"
   echo "-h, --help                    Display this help message"
   exit 1
 }
@@ -29,7 +38,7 @@ function print_usage {
 function install_ssh {
   if [[ $(dpkg-query -W -f='${Status}' $SSH_SERVICE 2>/dev/null | grep -c "ok installed") -eq 0 ]]; then
     echo "SSH is not installed. Installing..."
-    apt-get update && apt-get install -y $SSH_SERVICE
+    $SUDO apt-get update && $SUDO apt-get install -y $SSH_SERVICE
   else
     echo "SSH is already installed."
   fi
@@ -38,8 +47,9 @@ function install_ssh {
 # Function to set up root SSH login with password
 function enable_root_login {
   echo "Setting up root SSH login with password..."
-  sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-  service ssh restart
+  $SUDO sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+  $SUDO service ssh restart
+  echo "Set up root SSH login with password success"
 }
 
 # Function to create new user and set password
@@ -52,7 +62,7 @@ function create_user {
     read -s -p "Please enter a password for the new user: " NEW_PASSWORD
     echo
   fi
-  useradd -m $NEW_USER
+  $SUDO useradd -m $NEW_USER
   echo "$NEW_USER:$NEW_PASSWORD" | chpasswd
 }
 
@@ -67,6 +77,8 @@ function install_ssh_key {
   read -p "Please enter the SSH public key for $USER: " SSH_KEY
   echo "$SSH_KEY" >> ~/.ssh/authorized_keys
   chown -R $USER:$USER ~/.ssh
+  service ssh restart
+  echo "Install SSH public key success"
 }
 
 # Function to change SSH default port
@@ -80,15 +92,16 @@ function change_ssh_port {
     echo "Invalid SSH port number. Please enter a number between 1 and 65535."
     exit 1
   fi
-  sed -i "s/#Port 22/Port $SSH_PORT/" /etc/ssh/sshd_config
+  $SUDO sed -i "s/#Port 22/Port $SSH_PORT/" /etc/ssh/sshd_config
   service ssh restart
 }
 
 # Function to disable SSH password login
 function disable_password_login {
   echo "Disabling SSH password login..."
-  sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+  $SUDO sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
   service ssh restart
+  echo "SSH password login Disabled"
 }
 
 # Function to set the system timezone
@@ -98,7 +111,7 @@ function set_timezone {
   fi
   
   # set timezone by timedatectl
-  timedatectl set-timezone $TIMEZONE
+  $SUDO timedatectl set-timezone $TIMEZONE
   echo "Current timezone is: $(timedatectl status | grep "$TIMEZONE")"
   service cron restart
 
@@ -119,7 +132,7 @@ function set_hostname {
   fi
   
   # set hostname by hostnamectl
-  hostnamectl set-timezone $HOST_NAME
+  $SUDO hostnamectl set-timezone $HOST_NAME
   echo "Current hostname is: $(hostnamectl status | grep "$HOST_NAME")"
   echo "Please relogin terminal to show the new hostname."
 }
@@ -199,9 +212,19 @@ function unset_proxy {
 function install_docker {
   echo "Installing Docker and Docker Compose..."
   curl -fsSL https://get.docker.com -o get-docker.sh
-  sh get-docker.sh
-  usermod -aG docker $USER
+  $SUDO sh get-docker.sh
+  $SUDO usermod -aG docker $USER
+  echo "Install Docker success"
+  install_docker_compose
+}
+
+# Function to install docker-compose
+function install_docker_compose {
+  echo "Installing docker-compose..."
+  dkcp_tag=$(curl -fsSL https://api.github.com/repos/docker/compose/releases/latest | grep -w "tag_name" | awk -F '"' '{print $4}')
+  $SUDO curl -L "https://github.com/docker/compose/releases/download/${dkcp_tag}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && $SUDO chmod +x /usr/local/bin/docker-compose
   docker-compose --version
+  echo "Install docker-compose success"
 }
 
 # Check for user input and execute corresponding function
@@ -240,6 +263,9 @@ while [[ $# -gt 0 ]]; do
       shift;;
     -o|--install-docker)
       install_docker
+      shift;;
+    --install-docker-compose)
+      install_docker_compose
       shift;;
     -h|--help)
       print_usage
