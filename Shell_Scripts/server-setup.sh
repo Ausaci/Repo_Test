@@ -132,7 +132,7 @@ function set_hostname {
   fi
   
   # set hostname by hostnamectl
-  $SUDO hostnamectl set-timezone $HOST_NAME
+  $SUDO hostnamectl set-hostname $HOST_NAME
   echo "Current hostname is: $(hostnamectl status | grep "$HOST_NAME")"
   echo "Please relogin terminal to show the new hostname."
 }
