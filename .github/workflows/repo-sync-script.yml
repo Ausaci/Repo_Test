@@ -72,9 +72,9 @@ jobs:
 
       - name: Set up Python
         if: github.event.inputs.is_delete_releases == 'true' && github.event.inputs.is_delete_releases  != 'false'
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.10'
 
       - name: Delete releases
         if: github.event.inputs.is_delete_releases == 'true' && github.event.inputs.is_delete_releases  != 'false'
