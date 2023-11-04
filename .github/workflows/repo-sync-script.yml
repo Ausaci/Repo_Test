@@ -51,8 +51,8 @@ jobs:
           ls
           curl -fsSL ${{ secrets.SYNC_CSV_URL }} -o github.CSV
           curl -fsSL ${{ secrets.SYNC_REPO_SCRIPTS_URL }} -o sync-repo-action.py
-          dos2unix *.sh *.py *.CSV *.txt
-          chmod 755 *.sh *.py
+          dos2unix *.py *.CSV *.txt
+          chmod 755 *.py
 
       - name: Set up Python
         uses: actions/setup-python@v4
