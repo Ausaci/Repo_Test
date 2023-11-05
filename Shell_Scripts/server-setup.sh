@@ -18,19 +18,20 @@ NEW_PASSWORD=""
 function print_usage {
   echo "Usage: ./script.sh [options]"
   echo "Options:"
-  echo "-i, --install-ssh             Install SSH if not already installed"
-  echo "-r, --enable-root-login       Set up root SSH login with password"
-  echo "-c, --create-user             Create new user and set password"
-  echo "-k, --install-ssh-key         Install SSH public key for current user"
-  echo "-p, --change-ssh-port         Change SSH default port"
-  echo "-d, --disable-password-login  Disable SSH password login"
-  echo "-t, --set-timezone            Set the system timezone"
-  echo "-n, --set-hostname            Set the hostname"
-  echo "--set-proxy                   Set proxy settings on the system"
-  echo "--unset-proxy                 Cancel proxy settings on the system"
-  echo "-o, --install-docker          Install Docker and docker-compose"
-  echo "--install-docker-compose      Install docker-compose"
-  echo "-h, --help                    Display this help message"
+  echo "-i, --install-ssh               Install SSH if not already installed"
+  echo "-r, --enable-root-login         Set up root SSH login with password"
+  echo "-c, --create-user               Create new user and set password"
+  echo "-s, --sudo-nopasswd $USER       Allow user execute without password"
+  echo "-k, --install-ssh-key           Install SSH public key for current user"
+  echo "-p, --change-ssh-port $PORT     Change SSH default port"
+  echo "-d, --disable-password-login    Disable SSH password login"
+  echo "-t, --set-timezone              Set the system timezone"
+  echo "-n, --set-hostname              Set the hostname"
+  echo "--set-proxy                     Set proxy settings on the system"
+  echo "--unset-proxy                   Cancel proxy settings on the system"
+  echo "-o, --install-docker            Install Docker and docker-compose"
+  echo "--install-docker-compose        Install docker-compose"
+  echo "-h, --help                      Display this help message"
   exit 1
 }
 
@@ -65,6 +66,33 @@ function create_user {
   $SUDO useradd -m $NEW_USER
   echo "$NEW_USER:$NEW_PASSWORD" | chpasswd
 }
+
+
+# 函数名：sudo_nopasswd
+# 参数：$1 - 要允许免密码访问的用户名
+function sudo_nopasswd() {
+    # 检查参数是否为空
+    if [[ -z "$1" ]]; then
+        echo "Error: Username is required."
+        return 1
+    fi
+
+    # 检查当前用户是否具有 sudo 权限
+    sudo -n true > /dev/null 2>&1
+    if [[ $? -eq 0 ]]; then
+        # 判断 sudoers 文件是否已经存在免密码访问规则
+        if sudo grep -q "^$1" /etc/sudoers; then
+            echo "User '$1' already has NOPASSWD access."
+        else
+            # 将免密码访问规则追加到 sudoers 文件末尾
+            echo "$1 ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers >/dev/null
+            echo "User '$1' has been granted NOPASSWD access."
+        fi
+    else
+        echo "Error: You need to have sudo access to run this function."
+    fi
+}
+
 
 # Function to install SSH public key for current user
 function install_ssh_key {
@@ -239,6 +267,9 @@ while [[ $# -gt 0 ]]; do
     -c|--create-user)
       create_user
       shift;;
+    -s|--sudo-nopasswd)
+      sudo_nopasswd $2
+      shift 2;;
     -k|--install-ssh-key)
       install_ssh_key
       shift;;
@@ -276,3 +307,4 @@ while [[ $# -gt 0 ]]; do
       shift;;
   esac
 done
+
