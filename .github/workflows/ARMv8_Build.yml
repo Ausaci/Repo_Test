@@ -43,7 +43,7 @@ jobs:
 #      run: curl https://sc.ftqq.com/${{ secrets.ServerChan }}.send?text=${{ env.FILE_NAME }}_Build_Start
       
     - name: Checkout
-      uses: actions/checkout@master
+      uses: actions/checkout@v4
 
     - name: Initialization environment
       env:
